@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: configure ssh
         run: |
-          mkdir -p ~/.ssh
+          mkdir ~/.ssh
           echo "${{ secrets.AVIARYSECRETSELIAS_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keygen -H github.com >> ~/.ssh/knownhosts
