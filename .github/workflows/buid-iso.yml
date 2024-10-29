@@ -1,0 +1,11 @@
+name: build-iso
+on: [pull_request]
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v12
+      - name: build iso 
+        run: nix build .#nixosConfigurations.egg.config.system.build.isoImage
