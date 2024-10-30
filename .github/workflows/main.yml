@@ -17,7 +17,7 @@ jobs:
           ssh-keyscan -H github.com >> ~/.ssh/knownhosts
       - uses: DeterminateSystems/nix-installer-action@v12
       - id: update
-        uses: DeterminateSystems/update-flake-lock@v23
+        uses: DeterminateSystems/update-flake-lock@v24
       ### TO AUTOMERGE
       #- name: Merge
       #  run: gh pr merge --auto "${{ steps.update.outputs.pull-request-number }}" --rebase
