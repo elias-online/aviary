@@ -18,6 +18,8 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v12
       - id: update
         uses: DeterminateSystems/update-flake-lock@v24
+        with:
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
       ### TO AUTOMERGE
       #- name: Merge
       #  run: gh pr merge --auto "${{ steps.update.outputs.pull-request-number }}" --rebase
