@@ -22,7 +22,7 @@
     };
 
     secrets-elias = {
-      url = "git+ssh://git@github.com/elias-online/aviarySecretsElias.git?shallow=1";
+      url = "git+https://github.com/elias-online/aviarySecretsElias.git?shallow=1";
       flake = false;
     };
 
