@@ -16,7 +16,7 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H github.com >> ~/.ssh/knownhosts
           git config --global credential.helper store --file ~/.git-credentials
-          echo "https://elias-online:'"${{secrets.GH_TOKEN_FOR_UPDATES}}"'@github.com" > ~/.git-credentials
+          echo "https://elias-online:${{secrets.GH_TOKEN_FOR_UPDATES}}@github.com" > ~/.git-credentials
       - uses: DeterminateSystems/nix-installer-action@v12
       - id: update
         uses: DeterminateSystems/update-flake-lock@v24
