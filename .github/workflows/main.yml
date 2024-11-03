@@ -9,16 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: configure ssh
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.AVIARYSECRETSELIAS_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H github.com >> ~/.ssh/knownhosts
       - uses: DeterminateSystems/nix-installer-action@v12
       - id: update
         uses: DeterminateSystems/update-flake-lock@v24
         with:
+          nix-options: "--access-tokens github.com=${{ secrets.GH_TOKEN_FOR_UPDATES }}"
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
       ### TO AUTOMERGE
       #- name: Merge
