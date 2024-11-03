@@ -21,10 +21,10 @@
       url = "github:nix-community/impermanence";
     };
 
-    secrets-elias = {
-      url = "git+https://github.com/elias-online/aviarySecretsElias.git?ref=main&shallow=1";
-      flake = false;
-    };
+    #secrets-elias = {
+    #  url = "git+https://github.com/elias-online/aviarySecretsElias.git?ref=main&shallow=1";
+    #  flake = false;
+    #};
 
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-24.05";
