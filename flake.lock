@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1730190761,
-        "narHash": "sha256-o5m5WzvY6cGIDupuOvjgNSS8AN6yP2iI9MtUC6q/uos=",
+        "lastModified": 1730675461,
+        "narHash": "sha256-Mhqz3p/HEiI/zxBJWO57LYQf6gGlJB0tci6fiVXLjd8=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "3979285062d6781525cded0f6c4ff92e71376b55",
+        "rev": "380847d94ff0fedee8b50ee4baddb162c06678df",
         "type": "github"
       },
       "original": {
@@ -310,11 +310,11 @@
     "secrets-elias": {
       "flake": false,
       "locked": {
-        "lastModified": 1730136414,
-        "narHash": "sha256-sHg+WD5vv2uZ2wZ7IEH0s0N00zljpvEnULN9SCAISpQ=",
+        "lastModified": 1730691458,
+        "narHash": "sha256-n1HnCjUDGWsWlmvW5OJLK4vgb7pdhjBybL9SfFGBdnQ=",
         "owner": "elias-online",
         "repo": "aviarySecretsElias",
-        "rev": "aafcf8ed2d8ac7008e80caafc73543a23ef30c95",
+        "rev": "624a99e057bec6f8f3d72b6fef6fde59288b2479",
         "type": "github"
       },
       "original": {
