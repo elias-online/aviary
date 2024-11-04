@@ -1,6 +1,11 @@
 { config, lib, pkgs, ... }: {
 
-  imports = [ ];
+  imports = [
+    ./bootload.nix
+    ./network.nix
+    ./package.nix
+    ./update.nix
+  ];
 
   i18n = {
     defaultLocale = "en_US.UTF-8";
