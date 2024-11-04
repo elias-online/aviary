@@ -58,6 +58,23 @@
 	  ./users/nixos.nix
 	];
       };
+
+      pigeon = nixpkgs.lib.nixosSystem {
+        specialArgs = { inherit inputs; };
+	modules = [
+	  inputs.disko.nixosModules.default
+	  inputs.home-manager.nixosModules.default
+	  inputs.impermanence.nixosModules.impermanence
+	  inputs.sops-nix.nixosModules.sops
+
+	  ./systems/pigeon.nix
+	  ./users/elias.nix
+
+	  ( import ./environments/default.nix {
+	    environment = "minimal";
+	  })
+	];
+      };
     };
   };
 }
