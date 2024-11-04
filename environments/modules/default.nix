@@ -1,6 +1,11 @@
 { config, lib, pkgs, ... }: {
 
-  imports = [ ];
+  imports = [
+    ./bootload.nix
+    ./network.nix
+    ./package.nix
+    ./update.nix
+  ];
 
   i18n = {
     defaultLocale = "en_US.UTF-8";
@@ -21,7 +26,7 @@
     pkgs.age
     pkgs.disko
     pkgs.git
-    pkgs.nixos-anywhere
+    pkgs.home-manager
     pkgs.rsync
     pkgs.sops
     pkgs.ssh-to-age
