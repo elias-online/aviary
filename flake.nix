@@ -22,7 +22,7 @@
     };
 
     secrets-elias = {
-      url = "github:elias-online/aviarySecretsElias/main?shallow=1";
+      url = "git+ssh://git@github.com/elias-online/aviarySecretsElias.git?shallow=1";
       flake = false;
     };
 
@@ -56,6 +56,23 @@
 	  ./systems/egg.nix
 	  ./environments/modules/default.nix
 	  ./users/nixos.nix
+	];
+      };
+
+      pigeon = nixpkgs.lib.nixosSystem {
+        specialArgs = { inherit inputs; };
+	modules = [
+	  inputs.disko.nixosModules.default
+	  inputs.home-manager.nixosModules.default
+	  inputs.impermanence.nixosModules.impermanence
+	  inputs.sops-nix.nixosModules.sops
+
+	  ./systems/pigeon.nix
+	  ./users/elias.nix
+
+	  ( import ./environments/default.nix {
+	    environment = "minimal";
+	  })
 	];
       };
     };
