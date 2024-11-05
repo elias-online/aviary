@@ -13,7 +13,8 @@ jobs:
       - id: update
         uses: DeterminateSystems/update-flake-lock@v24
         with:
-          nix-options: "--access-tokens github.com=${{ secrets.GH_TOKEN_FOR_UPDATES }}"
+          #nix-options: "--access-tokens github.com=${{ secrets.GH_TOKEN_FOR_UPDATES }}"
+          inputs: disko hardware home-manager impermanence nixpkgs nixvim sops-nix
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
       ### TO AUTOMERGE
       #- name: Merge
