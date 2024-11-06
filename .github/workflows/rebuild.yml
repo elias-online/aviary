@@ -11,5 +11,5 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v12
       - name: rebuild
         run: |
-          nixos-generate-config --no-filesystems --show-hardware-config
-          ls -l /dev/disk/by-partlabel/
+          lsblk
+          ip a
