@@ -1,0 +1,13 @@
+name: rebuild
+on: [pull_request workflow_dispatch]
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v12
+      - name: rebuild
+        run: |
+          nixos-generate-config --no-filesystems --show-hardware-config
+          ls -l /dev/disk/by-partlabel/
