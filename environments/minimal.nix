@@ -10,6 +10,8 @@
   config = lib.mkIf config.minimal.enable {
 
     bootload.enable = true;
+    impermanence.enable = true;
+    lukspwdsync.enable = true;
     network.enable = true;
     package.enable = true;
     secrets.enable = true;

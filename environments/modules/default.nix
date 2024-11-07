@@ -2,6 +2,8 @@
 
   imports = [
     ./bootload.nix
+    ./impermanence.nix
+    ./lukspwdsync.nix
     ./network.nix
     ./package.nix
     ./update.nix
