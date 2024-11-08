@@ -10,8 +10,20 @@ in {
       secrets = {
         password-hash.neededForUsers = true;
 	password-previous = {};
-	password = {};
+	password.restartUnits = [ "lukspwdsync.service" ];
+	swallow-wg-env = {};
+	crow-ssh-key = {
+	  mode = "0600";
+	  owner = "jason";
+	  path = "/home/jason/.ssh/id_ed25519";
+	};
+	crow-ssh-key-public = {};
       };
+    };
+
+    services.displayManager.autoLogin = {
+      enable = true;
+      user = "jason";
     };
 
     users.users."jason" = {

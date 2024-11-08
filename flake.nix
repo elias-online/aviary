@@ -71,7 +71,7 @@
 	  ./users/jason.nix
 
 	  ( import ./environments/default.nix {
-	    environment = "minimal";
+	    environment = "desktop";
 	  })
 
 	];

@@ -1,12 +1,20 @@
 { config, lib, pkgs, ... }: {
 
   imports = [
+    ./bluetooth.nix
     ./bootload.nix
+    ./flatpak.nix
+    ./gnome.nix
     ./impermanence.nix
     ./lukspwdsync.nix
     ./network.nix
     ./package.nix
+    ./pipewire.nix
+    ./plymouth.nix
+    ./powerprofile.nix
+    ./print.nix
     ./update.nix
+    ./vpn.nix
   ];
 
   i18n = {

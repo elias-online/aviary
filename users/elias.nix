@@ -12,6 +12,11 @@ in {
       };
     };
 
+    services.displayManager.autoLogin = {
+      enable = true;
+      user = "elias";
+    };
+
     users.users."elias" = {
       isNormalUser = true;
       hashedPasswordFile = config.sops.secrets.password-hash.path;

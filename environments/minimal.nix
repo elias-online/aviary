@@ -16,5 +16,6 @@
     package.enable = true;
     secrets.enable = true;
     update.enable = true;
+    vpn.enable = true;
   };
 }
