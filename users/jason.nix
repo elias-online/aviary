@@ -9,6 +9,7 @@ in {
       defaultSopsFile = "${secretsElias}/secrets/jason.yaml";
       secrets = {
         password-hash.neededForUsers = true;
+	password-previous = {};
       };
     };
 
