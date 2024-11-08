@@ -10,6 +10,7 @@ in {
       secrets = {
         password-hash.neededForUsers = true;
 	password-previous = {};
+	password = {};
       };
     };
 
