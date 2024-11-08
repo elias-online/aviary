@@ -59,6 +59,24 @@
 	];
       };
 
+      crow = nixpkgs.lib.nixosSystem {
+        specialArgs = { inherit inputs; };
+	modules = [
+	  inputs.disko.nixosModules.default
+	  inputs.home-manager.nixosModules.default
+	  inputs.impermanence.nixosModules.impermanence
+	  inputs.sops-nix.nixosModules.sops
+
+	  ./systems/crow.nix
+	  ./users/jason.nix
+
+	  ( import ./environments/default.nix {
+	    environment = "minimal";
+	  })
+
+	];
+      };
+
       pigeon = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
 	modules = [
