@@ -10,4 +10,6 @@
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.beta; #change to "stable" for v550
   };
+
+  services.xserver.displayManager.gdm.wayland = false;
 }
