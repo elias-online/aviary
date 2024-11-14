@@ -77,6 +77,23 @@
 	];
       };
 
+      ibis = nixpkgs.lib.nixosSystem {
+        specialArgs = { inherit inputs; };
+	modules = [
+	  inputs.disko.nixosModules.default
+	  inputs.home-manager.nixosModules.default
+	  inputs.impermanence.nixosModules.impermanence
+	  inputs.sops-nix.nixosModules.sops
+
+	  ./systems/ibis.nix
+	  ./users/elias.nix
+
+	  (import ./environments/default.nix {
+	    environment = "desktop";
+	  })
+	];
+      };
+
       pigeon = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
 	modules = [
