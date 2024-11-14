@@ -9,6 +9,7 @@ in {
       defaultSopsFile = "${secretsElias}/secrets/elias.yaml";
       secrets = {
         password-hash.neededForUsers = true;
+	tailscale-authkey = {};
       };
     };
 
