@@ -18,6 +18,7 @@ in {
 	  path = "/home/jason/.ssh/id_ed25519";
 	};
 	crow-ssh-key-public = {};
+	tailscale-authkey = {};
       };
     };
 

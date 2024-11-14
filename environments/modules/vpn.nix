@@ -34,5 +34,14 @@
 	};
       };
     };
+
+    services.tailscale = {
+      enable = true;
+      authKeyFile = config.sops.secrets.tailscale-authkey.path;
+    };
+
+    environment.persistence."/persist".directories = [
+      "/var/lib/tailscale"
+    ];
   };
 }

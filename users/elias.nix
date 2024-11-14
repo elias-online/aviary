@@ -11,6 +11,7 @@ in {
         password-hash.neededForUsers = true;
 	password.restartUnits = [ "lukspwdsync.service" ];
 	password-previous = {};
+	tailscale-authkey = {};
       };
     };
 
