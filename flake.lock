@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1731274291,
-        "narHash": "sha256-cZ0QMpv5p2a6WEE+o9uu0a4ma6RzQDOQTbm7PbixWz8=",
+        "lastModified": 1731549112,
+        "narHash": "sha256-c9I3i1CwZ10SoM5npQQVnfwgvB86jAS3lT4ZqkRoSOI=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "486250f404f4a4f4f33f8f669d83ca5f6e6b7dfc",
+        "rev": "5fd852c4155a689098095406500d0ae3d04654a8",
         "type": "github"
       },
       "original": {
@@ -237,11 +237,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1731239293,
-        "narHash": "sha256-q2yjIWFFcTzp5REWQUOU9L6kHdCDmFDpqeix86SOvDc=",
+        "lastModified": 1731386116,
+        "narHash": "sha256-lKA770aUmjPHdTaJWnP3yQ9OI1TigenUqVC3wweqZuI=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "9256f7c71a195ebe7a218043d9f93390d49e6884",
+        "rev": "689fed12a013f56d4c4d3f612489634267d86529",
         "type": "github"
       },
       "original": {
@@ -310,10 +310,10 @@
     "secrets-elias": {
       "flake": false,
       "locked": {
-        "lastModified": 1731048580,
-        "narHash": "sha256-tVmK+gHow3CLqaiKrZKvObnrQ7+MtAxJAh3xn3B8vyM=",
+        "lastModified": 1731557333,
+        "narHash": "sha256-cefsvd03DN+LMpDsuodqvNr/3HWWZFyjfBz3P/nom7k=",
         "ref": "refs/heads/main",
-        "rev": "c6f91dfcf39b847e3874e406bdc91caa91f0e547",
+        "rev": "636f661bbf228284b20e36655e1555c0c4ab4ad1",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/elias-online/aviarySecretsElias.git"
