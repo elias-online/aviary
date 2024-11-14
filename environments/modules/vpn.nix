@@ -34,5 +34,7 @@
 	};
       };
     };
+
+    services.tailscale.enable = true;
   };
 }
