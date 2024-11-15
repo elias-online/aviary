@@ -22,6 +22,10 @@ in {
       };
     };
 
+    systemd.tmpfiles.rules = [
+      "d /home/elias/.ssh 0700 elias users -"
+    ];
+
     services.displayManager.autoLogin = {
       enable = true;
       user = "elias";
