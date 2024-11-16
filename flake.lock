@@ -287,11 +287,11 @@
         "impermanence": "impermanence",
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
-        "secrets-elias": "secrets-elias",
+        "secrets": "secrets",
         "sops-nix": "sops-nix"
       }
     },
-    "secrets-elias": {
+    "secrets": {
       "flake": false,
       "locked": {
         "lastModified": 1731918535,

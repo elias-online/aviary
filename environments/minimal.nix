@@ -13,8 +13,6 @@
     lukspwdsync.enable = true;
     network.enable = true;
     package.enable = true;
-    secrets.enable = true;
     update.enable = true;
-    vpn.enable = true;
   };
 }

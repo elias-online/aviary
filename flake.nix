@@ -21,7 +21,7 @@
       url = "github:nix-community/impermanence";
     };
 
-    secrets-elias = {
+    secrets = {
       url = "git+ssh://git@github.com/elias-online/aviarySecretsElias.git?shallow=1";
       flake = false;
     };

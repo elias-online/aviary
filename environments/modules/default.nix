@@ -61,6 +61,9 @@
     nano.enable = false;
   };
 
+  secrets.enable = true;
+  vpn.enable = true;
+
   documentation.doc.enable = false;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
