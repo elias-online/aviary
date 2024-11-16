@@ -4,6 +4,11 @@
 
   config = lib.mkIf config.lukspwdsync.enable {
 
+    sops.secrets = {
+      password-previous = {};
+      password.restartUnits = [ "lukspwdsync.service" ];
+    };
+
     systemd.services."lukspwdsync" = {
       enable = true;
       description = "Syncronize luks passkey with user password";  
