@@ -1,43 +1,30 @@
-{ config, lib, ... }: {
+{ config, lib, pkgs, ... }: {
 
   options.vpn.enable = lib.mkEnableOption "enable vpn";
 
-  config = lib.mkIf config.vpn.enable {
+  config = lib.mkIf config.vpn.enable { 
 
-    networking.networkmanager.ensureProfiles = {
+    sops.secrets.tailscale-authkey = {};
 
-      environmentFiles = [ config.sops.secrets."swallow-wg-env".path ];
+    services.tailscale.enable = true;
 
-      profiles.swallow = {
-        connection = {
-          id = "Swallow";
-          interface-name = "wg0";
-          type = "wireguard";
-	  autoconnect = "false";
-          permissions = "$SWALLOW_PERMISSIONS";
-        };
+    systemd.services.tailscale-autoconnect = {
+      description = "Automatic connection to Tailscale";
+      after = [ "network-pre.target" "tailscale.service" ];
+      wants = [ "network-pre.target" "tailscale.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig.Type = "oneshot";
+      script = with pkgs; ''
+        sleep 2
 
-        "wireguard-peer.$SWALLOW_PUBLIC_KEY" = {
-          endpoint = "$SWALLOW_ENDPOINT";
-          persistent-keepalive = "25";
-          allowed-ips = "0.0.0.0/0;::/0;";
-        };
+        status="$(${tailscale}/bin/tailscale status -json | ${jq}/bin/jq -r .BackendState)"
+        if [ $status = "Running" ]; then
+          exit 0
+        fi
 
-        ipv4 = {
-          dns = "$SWALLOW_DNS";
-          method = "manual";
-        };
-
-        ipv6 = {
-          addr-gen-mode = "stable-privacy";
-          method = "ignore";
-	};
-      };
-    };
-
-    services.tailscale = {
-      enable = true;
-      authKeyFile = config.sops.secrets.tailscale-authkey.path;
+        authKey="$(cat ${config.sops.secrets.tailscale-authkey.path})"
+        ${tailscale}/bin/tailscale up -authkey "$authKey"
+      '';
     };
 
     environment.persistence."/persist".directories = [

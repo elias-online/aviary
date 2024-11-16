@@ -9,18 +9,19 @@ in {
       defaultSopsFile = "${secretsElias}/secrets/jason.yaml";
       secrets = {
         password-hash.neededForUsers = true;
-	password-previous = {};
 	password.restartUnits = [ "lukspwdsync.service" ];
-	swallow-wg-env = {};
-	crow-ssh-key = {
+	password-previous = {};
+	crow-ssh-key = if builtins.toString config.networking.hostName == "crow" then {
 	  mode = "0600";
 	  owner = "jason";
 	  path = "/home/jason/.ssh/id_ed25519";
-	};
-	crow-ssh-key-public = {};
-	tailscale-authkey = {};
+	} else {};
       };
     };
+
+    systemd.tmpfiles.rules = [
+      "d /home/jason/.ssh 0700 jason users -"
+    ];
 
     services.displayManager.autoLogin = {
       enable = true;

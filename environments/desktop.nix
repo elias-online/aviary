@@ -2,7 +2,6 @@
 
   imports = [ 
     ./modules/default.nix
-    ./modules/secrets.nix
   ];
 
   options.desktop.enable = lib.mkEnableOption "enable desktop environment";

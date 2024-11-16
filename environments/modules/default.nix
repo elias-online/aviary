@@ -13,6 +13,7 @@
     ./plymouth.nix
     ./powerprofile.nix
     ./print.nix
+    ./secrets.nix
     ./update.nix
     ./vpn.nix
   ];

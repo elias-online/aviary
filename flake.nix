@@ -52,6 +52,7 @@
         specialArgs = { inherit inputs; };
 	modules = [
 	  inputs.impermanence.nixosModules.impermanence
+	  inputs.sops-nix.nixosModules.sops
 
 	  ./systems/egg.nix
 	  ./environments/modules/default.nix

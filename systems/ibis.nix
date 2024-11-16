@@ -85,18 +85,7 @@
       ModelTabletModeNoSuspend=1
     '';
   }; 
-
-  networking.networkmanager.ensureProfiles = {
-    environmentFiles = [
-      config.sops.secrets."ibis-wg-env".path
-    ];
-
-    profiles.swallow = {
-      wireguard.private-key = "$IBIS_PRIVATE_KEY";
-      ipv4.address1 = "$IBIS_ADDRESS";
-    };
-  };
-
+ 
   system.stateVersion = "24.05";
   networking.hostName = "ibis";
   time.timeZone = "America/Denver";
