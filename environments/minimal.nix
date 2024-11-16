@@ -2,7 +2,6 @@
 
   imports = [
     ./modules/default.nix
-    ./modules/secrets.nix
   ];
 
   options.minimal.enable = lib.mkEnableOption "enable minimal environment";

@@ -16,9 +16,6 @@ in {
 	  owner = "elias";
 	  path = "/home/elias/.ssh/id_ed25519";
 	} else {};
-	tailscale-authkey = {};
-	swallow-wg-env = {};
-	ibis-wg-env = {};
       };
     };
 
