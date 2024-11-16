@@ -9,8 +9,6 @@ in {
       defaultSopsFile = "${secretsElias}/secrets/elias.yaml";
       secrets = {
         password-hash.neededForUsers = true;
-	password.restartUnits = [ "lukspwdsync.service" ];
-	password-previous = {};
 	ibis-ssh-key = if builtins.toString config.networking.hostName == "ibis" then {
 	  mode = "0600";
 	  owner = "elias";

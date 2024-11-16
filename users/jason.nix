@@ -9,8 +9,6 @@ in {
       defaultSopsFile = "${secretsElias}/secrets/jason.yaml";
       secrets = {
         password-hash.neededForUsers = true;
-	password.restartUnits = [ "lukspwdsync.service" ];
-	password-previous = {};
 	crow-ssh-key = if builtins.toString config.networking.hostName == "crow" then {
 	  mode = "0600";
 	  owner = "jason";
