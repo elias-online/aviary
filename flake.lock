@@ -237,32 +237,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1731652201,
-        "narHash": "sha256-XUO0JKP1hlww0d7mm3kpmIr4hhtR4zicg5Wwes9cPMg=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "c21b77913ea840f8bcf9adf4c41cecc2abffd38d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-24.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs-stable": {
-      "locked": {
         "lastModified": 1731797254,
         "narHash": "sha256-df3dJApLPhd11AlueuoN0Q4fHo/hagP75LlM5K1sz9g=",
-        "owner": "NixOS",
+        "owner": "nixos",
         "repo": "nixpkgs",
         "rev": "e8c38b73aeb218e27163376a2d617e61a2ad9b59",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
-        "ref": "release-24.05",
+        "owner": "nixos",
+        "ref": "nixos-24.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -310,10 +294,10 @@
     "secrets-elias": {
       "flake": false,
       "locked": {
-        "lastModified": 1731718633,
-        "narHash": "sha256-Tm3YSQr1CZrLlHAcFNPy9R6afT63k4GpIfhxx8mud44=",
+        "lastModified": 1731874285,
+        "narHash": "sha256-CIvw2IbRZo9fSWzykpdUgaBTYQ6Yh31yxcItyte5leQ=",
         "ref": "refs/heads/main",
-        "rev": "04fca71b3e4783646f434a5048e0722d09d23e31",
+        "rev": "0051f0ae489900736b645cddbfeeb02bd3fb5d51",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/elias-online/aviarySecretsElias.git"
@@ -328,15 +312,14 @@
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
-        ],
-        "nixpkgs-stable": "nixpkgs-stable"
+        ]
       },
       "locked": {
-        "lastModified": 1731824381,
-        "narHash": "sha256-Zluegq0O709V6tL1fhDkOyVUQsvVfI0jamDSb8NNYlw=",
+        "lastModified": 1731862312,
+        "narHash": "sha256-NVUTFxKrJp/hjehlF1IvkPnlRYg/O9HFVutbxOM8zNM=",
         "owner": "mic92",
         "repo": "sops-nix",
-        "rev": "eee831aadbc25f72fa9d214d57bddfd847e026b2",
+        "rev": "472741cf3fee089241ac9ea705bb2b9e0bfa2978",
         "type": "github"
       },
       "original": {
