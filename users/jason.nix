@@ -31,6 +31,9 @@ in {
       hashedPasswordFile = config.sops.secrets.password-hash.path;
       description = "Jason";
       extraGroups = [ "networkmanager" "wheel" ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIELnLG7uX0hFQ35gKBQG+YwSfXFnsHxcmtSNOxMiFEjl elias@ibis"
+      ];
     };
   };
 }
