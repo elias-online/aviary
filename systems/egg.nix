@@ -7,6 +7,8 @@
   networking.hostName = "egg";
   time.timeZone = "America/Los_Angeles";
 
+  isoImage.isoName = lib.mkForce "egg.iso";
+
   services = {
     getty = {
       autologinUser = lib.mkForce null;
