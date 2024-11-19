@@ -8,6 +8,8 @@
 
 { inputs, modulesPath, ... }: {
 
+  sops.secrets.pigeon-ts-key = {};
+
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     inputs.hardware.nixosModules.common-cpu-amd
@@ -19,6 +21,10 @@
       ### BACKUP DRIVE ###
       #primary = "/dev/disk/by-id/nvme-INTEL_SSDPEK1A058GA_BTOC14120Y05058A";
       ####################
+    })
+
+    (import ./hardware/pigeon.nix {
+      tskey = config.sops.secrets.pigeon-ts-key.path;
     })
   ];
 

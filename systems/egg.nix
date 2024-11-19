@@ -1,6 +1,14 @@
 { lib, modulesPath, ... }: {
 
-  imports = [ "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix" ];
+  sops.secrets.egg-ts-key = {};
+
+  imports = [
+    "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
+
+    (import ./hardware/vpn.nix {
+      tskey = config.sops.secrets.egg-ts-key.path;
+    })
+  ];
 
   boot.kernelParams = [ "copytoram" ];
 

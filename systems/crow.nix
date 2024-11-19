@@ -9,6 +9,8 @@
 
 { inputs, modulesPath, ... }: {
 
+  sops.secrets.crow-ts-key = {};
+
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     inputs.hardware.nixosModules.common-cpu-intel
@@ -18,6 +20,10 @@
 
     (import ./hardware/single.nix {
       primary = "/dev/disk/by-id/nvme-TEAM_TM8FP6002T_TPBF2401170060201436";
+    })
+
+    (import ./hardware/vpn.nix {
+      tskey = config.sops.secrets.crow-ts-key.path;
     })
   ];
 

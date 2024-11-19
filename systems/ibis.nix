@@ -8,6 +8,8 @@
 
 { config, inputs, pkgs, modulesPath, ... }: {
 
+  sops.secrets.ibis-ts-key = {};
+
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     inputs.hardware.nixosModules.microsoft-surface-pro-intel
@@ -16,6 +18,10 @@
     (import ./hardware/single.nix {
       primary = "/dev/disk/by-id/nvme-SAMSUNG_MZ9LQ256HBJQ-00000_S595NF0R372569";
       #primary = "/dev/disk/by-id/nvme-Predator_SSD_GM7000_512GB_PSBG32530200043";
+    })
+
+    (import ./hardware/vpn.nix {
+      tskey = config.sops.secrets.ibis-ts-key.path;
     })
   ];
 

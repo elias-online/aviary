@@ -13,10 +13,17 @@
     ./plymouth.nix
     ./powerprofile.nix
     ./print.nix
-    ./secrets.nix
     ./update.nix
-    ./vpn.nix
   ];
+
+  sops = {
+    validateSopsFiles = false;
+    age = {
+      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+      keyFile = "/var/keys/age_host_key";
+      generateKey = true;
+    };
+  };
 
   i18n = {
     defaultLocale = "en_US.UTF-8";
@@ -60,9 +67,6 @@
 
     nano.enable = false;
   };
-
-  secrets.enable = true;
-  vpn.enable = true;
 
   documentation.doc.enable = false;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
