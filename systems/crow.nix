@@ -7,7 +7,7 @@
 # WFI: Intel AX210NGW
 ################
 
-{ inputs, modulesPath, ... }: {
+{ config, inputs, modulesPath, ... }: {
 
   sops.secrets.crow-ts-key = {};
 

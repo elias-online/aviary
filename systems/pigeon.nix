@@ -6,7 +6,7 @@
 # ETH: AQTION AQC107 10Gbps
 #################
 
-{ inputs, modulesPath, ... }: {
+{ config, inputs, modulesPath, ... }: {
 
   sops.secrets.pigeon-ts-key = {};
 
