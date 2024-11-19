@@ -1,4 +1,4 @@
-{ pkgs, tskey ? throw "Set the tskey", ... }: {
+{ tskey ? throw "Set the tskey", ... }: {
 
   services.tailscale.enable = true;
 
@@ -8,16 +8,16 @@
     wants = [ "network-pre.target" "tailscale.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig.Type = "oneshot";
-    script = with pkgs; ''
+    script = ''
       sleep 2
 
-      status="$(${tailscale}/bin/tailscale status -json | ${jq}/bin/jq -r .BackendState)"
+      status="$(/run/current-system/sw/bin/tailscale status -json | ${jq}/bin/jq -r .BackendState)"
       if [ $status = "Running" ]; then
         exit 0
       fi
 
       authKey="$(cat ${builtins.toString tskey})"
-      ${tailscale}/bin/tailscale up -authkey "$authKey"
+      /run/current-system/sw/bin/tailscale up -authkey "$authKey"
     '';
   };
 
