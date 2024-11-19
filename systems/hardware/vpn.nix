@@ -11,7 +11,7 @@
     script = ''
       sleep 2
 
-      status="$(/run/current-system/sw/bin/tailscale status -json | ${jq}/bin/jq -r .BackendState)"
+      status="$(/run/current-system/sw/bin/tailscale status -json | /run/current-system/sw/bin/jq -r .BackendState)"
       if [ $status = "Running" ]; then
         exit 0
       fi
