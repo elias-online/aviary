@@ -44,6 +44,7 @@
     pkgs.age
     pkgs.disko
     pkgs.git
+    pkgs.jq
     pkgs.nixos-anywhere
     pkgs.rsync
     pkgs.sops
