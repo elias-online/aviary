@@ -1,12 +1,12 @@
 { config, inputs, lib, pkgs, ... }:
 let
-  secretsElias = builtins.toString inputs.secrets-elias;
+  secrets = builtins.toString inputs.secrets;
 in {
 
   config = {
 
     sops = {
-      defaultSopsFile = "${secretsElias}/secrets/elias.yaml";
+      defaultSopsFile = "${secrets}/secrets/elias.yaml";
       secrets = {
         password-hash.neededForUsers = true;
 	ibis-ssh-key = if builtins.toString config.networking.hostName == "ibis" then {

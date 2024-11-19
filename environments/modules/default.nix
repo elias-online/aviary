@@ -13,10 +13,17 @@
     ./plymouth.nix
     ./powerprofile.nix
     ./print.nix
-    ./secrets.nix
     ./update.nix
-    ./vpn.nix
   ];
+
+  sops = {
+    validateSopsFiles = false;
+    age = {
+      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+      keyFile = "/var/keys/age_host_key";
+      generateKey = true;
+    };
+  };
 
   i18n = {
     defaultLocale = "en_US.UTF-8";
@@ -37,6 +44,7 @@
     pkgs.age
     pkgs.disko
     pkgs.git
+    pkgs.jq
     pkgs.nixos-anywhere
     pkgs.rsync
     pkgs.sops

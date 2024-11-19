@@ -1,12 +1,12 @@
 { config, inputs, ... }:
 let
-  secretsElias = builtins.toString inputs.secrets-elias;
+  secrets = builtins.toString inputs.secrets;
 in {
 
   config = {
     
     sops = {
-      defaultSopsFile = "${secretsElias}/secrets/jason.yaml";
+      defaultSopsFile = "${secrets}/secrets/jason.yaml";
       secrets = {
         password-hash.neededForUsers = true;
 	crow-ssh-key = if builtins.toString config.networking.hostName == "crow" then {

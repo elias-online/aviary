@@ -265,11 +265,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1730550779,
-        "narHash": "sha256-2stntmqw/GBOVEoPV4oCLHZljpeSBfZn8wkcJpei+ng=",
+        "lastModified": 1731959181,
+        "narHash": "sha256-RryrMTaCvmXzhl0lYm/jAG8bAxsAhEcNq1JRtkCL4wI=",
         "owner": "nix-community",
         "repo": "nixvim",
-        "rev": "91c06026075f08a3c865fdc46cc6db8e2af35a1e",
+        "rev": "8d29728abfcc2e4207afb3fd8606feff17c15cec",
         "type": "github"
       },
       "original": {
@@ -287,17 +287,17 @@
         "impermanence": "impermanence",
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
-        "secrets-elias": "secrets-elias",
+        "secrets": "secrets",
         "sops-nix": "sops-nix"
       }
     },
-    "secrets-elias": {
+    "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1731918535,
-        "narHash": "sha256-/6yq/fRbclkXRVYULmnfVbPqYPLNP/8NXv8r0nS+1y4=",
+        "lastModified": 1731977404,
+        "narHash": "sha256-+5O9PazDe9qqMqkcfoXVQZ72GaIkmv71GwnZ4vyCaDY=",
         "ref": "refs/heads/main",
-        "rev": "ca371db57d36400c43dc31364d8ef316c803ede5",
+        "rev": "ef3b27f2ca43b3176a315010364c5dc2365bfec1",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/elias-online/aviarySecretsElias.git"
@@ -315,11 +315,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1731862312,
-        "narHash": "sha256-NVUTFxKrJp/hjehlF1IvkPnlRYg/O9HFVutbxOM8zNM=",
+        "lastModified": 1731954233,
+        "narHash": "sha256-vvXx1m2Rsw7MkbKJdpcICzz4YPgZPApGKQGhNZfkhOI=",
         "owner": "mic92",
         "repo": "sops-nix",
-        "rev": "472741cf3fee089241ac9ea705bb2b9e0bfa2978",
+        "rev": "e39947d0ee8e341fa7108bd02a33cdfa24a1360e",
         "type": "github"
       },
       "original": {
