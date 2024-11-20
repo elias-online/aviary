@@ -1,12 +1,22 @@
-{ config, lib, modulesPath, ... }: {
+{ config, lib, modulesPath, ... }:
+let
+  tskeystring = ""; # Put tailscale onboarding auth key here
+in {
 
-  sops.secrets.egg-ts-key = {};
+  environment = {
+    etc."tskey".text = ''
+      ${tskeystring}
+    '';
+    persistence."/persist".files = [
+      "/etc/tskey"
+    ];
+  };
 
   imports = [
     "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
 
     (import ./hardware/vpn.nix {
-      tskey = config.sops.secrets.egg-ts-key.path;
+      tskey = "/etc/tskey";
     })
   ];
 
