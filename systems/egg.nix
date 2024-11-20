@@ -4,12 +4,8 @@ let
 in {
 
   environment = {
-    etc."tskey".text = ''
-      ${tskeystring}
-    '';
-    persistence."/persist".files = [
-      "/etc/tskey"
-    ];
+    etc."tskey".text = "${tskeystring}";
+    persistence."/persist".files = [ "/etc/tskey" ];
   };
 
   imports = [
