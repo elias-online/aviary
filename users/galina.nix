@@ -1,12 +1,12 @@
 { config, inputs, ... }:
 let
-  secretsElias = builtins.toString inputs.secrets-elias;
+  secrets = builtins.toString inputs.secrets;
 in {
 
   config = {
 
     sops = {
-      defaultSopsFile = "${secretsElias}/secrets/galina.yaml";
+      defaultSopsFile = "${secrets}/secrets/galina.yaml";
       secrets = {
         password-hash.neededForUsers = true;
 	quail-ssh-key = if builtins.toString config.networking.hostName == "quail" then {
