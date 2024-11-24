@@ -98,17 +98,17 @@
 	    '';
 	  };
 
-	  "ts-disconnect" = {
-	    description = "Disconnect from Tailscale";
-	    after = [ "local-fs.target" ];
-	    before = [ "sysinit.target" ];
-	    wants = [ "local-fs.target" ];
-	    wantedBy = [ "sysinit.target" ];
-	    script = ''
-	      pkill .tailscaled-wrapped
-	      .tailscaled-wrapped --cleanup
-	    '';
-	  };
+	  #"ts-disconnect" = {
+	  #  description = "Disconnect from Tailscale";
+	  #  after = [ "local-fs.target" ];
+	  #  before = [ "sysinit.target" ];
+	  #  wants = [ "local-fs.target" ];
+	  #  wantedBy = [ "sysinit.target" ];
+	  #  script = ''
+	  #    pkill .tailscaled-wrapped
+	  #    .tailscaled-wrapped --cleanup
+	  #  '';
+	  #};
 	};
       };
     };
