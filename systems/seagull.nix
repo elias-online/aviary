@@ -5,7 +5,7 @@
 # STO: PNY 120GB SATA SSD
 #################
 
-{ inputs, modulesPath, ... }: {
+{ config, inputs, modulesPath, ... }: {
 
   sops.secrets.seagull-ts-key = {};
 
