@@ -76,9 +76,8 @@
 	  "ts-connect" = {
 	    description = "Connect to Tailscale";
 	    after = [ "network-online.target" ];
-	    before = [ "local-fs.target" ];
 	    wants = [ "network-online.target" ];
-	    wantedBy = [ "local-fs.target" ];
+	    wantedBy = [ "sysinit.target" ];
 	    script = ''
               copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscaled-wrapped
               copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscale-wrapped
