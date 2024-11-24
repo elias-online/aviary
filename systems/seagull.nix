@@ -14,7 +14,7 @@
     inputs.hardware.nixosModules.common-cpu-intel
     inputs.hardware.nixosModules.common-pc-ssd
     
-    (import ./hardware/singlenas.nix {
+    (import ./hardware/singleserver.nix {
       primary = "/dev/disk/by-id/ata-PNY_CS1311_120GB_SSD_PNY121601207901005F9";
     })
 
