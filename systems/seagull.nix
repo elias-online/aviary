@@ -7,7 +7,15 @@
 
 { config, inputs, modulesPath, ... }: {
 
-  sops.secrets.seagull-ts-key = {};
+  sops.secrets = {
+    seagull-clevis-key = {
+      mode = "0600";
+      owner = "root";
+      group = "root";
+      path = "/clevis.jwe";
+    };
+    seagull-ts-key = {};
+  };
 
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -35,6 +43,7 @@
     clevis = {
       enable = true;
       useTang = true;
+      devices."/dev/sda2".secretFile = /clevis.jwe
     };
   ]; 
 
