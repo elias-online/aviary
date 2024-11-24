@@ -43,7 +43,7 @@
     clevis = {
       enable = true;
       useTang = true;
-      devices."/dev/sda2".secretFile = /clevis.jwe;
+      devices."/dev/disk/by-partlabel/disk-primary-root".secretFile = /clevis.jwe;
     };
   }; 
 
