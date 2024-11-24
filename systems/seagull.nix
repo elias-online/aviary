@@ -38,7 +38,7 @@
       "sd_mod"
       "usbhid"
       "usb_storage"
-    ;
+    ];
 
     clevis = {
       enable = true;
