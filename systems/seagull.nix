@@ -23,12 +23,19 @@
     })
   ];
 
-  boot.initrd.availableKernelModules = [
-    "ahci"
-    "ehci_pci"
-    "sd_mod"
-    "usbhid"
-    "usb_storage"
+  boot.initrd = {
+    availableKernelModules = [
+      "ahci"
+      "ehci_pci"
+      "sd_mod"
+      "usbhid"
+      "usb_storage"
+    };
+
+    clevis = {
+      enable = true;
+      useTang = true;
+    };
   ]; 
 
   boot.kernelModules = [ "kvm-intel" ];
