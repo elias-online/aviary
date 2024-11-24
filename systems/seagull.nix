@@ -38,14 +38,14 @@
       "sd_mod"
       "usbhid"
       "usb_storage"
-    };
+    ;
 
     clevis = {
       enable = true;
       useTang = true;
       devices."/dev/sda2".secretFile = /clevis.jwe
     };
-  ]; 
+  }; 
 
   boot.kernelModules = [ "kvm-intel" ];
 
