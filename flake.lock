@@ -148,7 +148,7 @@
     },
     "hardware": {
       "locked": {
-        "lastModified": 1734352517,
+       "lastModified": 1734352517,
         "narHash": "sha256-mfv+J/vO4nqmIOlq8Y1rRW8hVsGH3M+I2ESMjhuebDs=",
         "owner": "nixos",
         "repo": "nixos-hardware",
@@ -351,11 +351,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1734383433,
+       "lastModified": 1734383433,
         "narHash": "sha256-jB7uUkWZt7uZDVvCDVoOsSVyftCptovWs5dJZBINQ6E=",
         "ref": "refs/heads/main",
         "rev": "979e79effb14e769ffbd8aff6f2c6ab98f955a72",
-        "shallow": true,
+       "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/elias-online/aviarySecretsElias.git"
       },
