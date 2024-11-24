@@ -7,7 +7,10 @@
 
 { config, inputs, modulesPath, ... }: {
 
-  sops.secrets.seagull-ts-key = {};
+  sops.secrets = {
+    seagull-ts-key = {};
+    seagull-ts-initrd = {};
+  };
 
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -21,6 +24,8 @@
     (import ./hardware/vpn.nix {
       tskey = config.sops.secrets.seagull-ts-key.path;
     })
+
+    ./hardware/vpn-initrd.nix
   ];
 
   boot.initrd.availableKernelModules = [
@@ -35,5 +40,10 @@
 
   system.stateVersion = "24.05";
   networking.hostName = "seagull";
-  time.timeZone = "America/Los_Angeles"; 
+  time.timeZone = "America/Los_Angeles";
+
+  remote-machine.boot.tailscaleUnlock = {
+    enable = true;
+    tailscaleStatePath = config.sops.secrets.seagull-ts-initrd.path;
+  };
 }
