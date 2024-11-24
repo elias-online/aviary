@@ -51,17 +51,6 @@
         network = {
           enable = true;
           flushBeforeStage2 = true;
-          postCommands = ''
-            # Bring up tailscaled and dial in
-            echo 'nameserver 8.8.8.8' > /etc/resolv.conf
-            mkdir /dev/net
-            mknod /dev/net/tun c 10 200
-            .tailscaled-wrapped 2>/dev/null &
-            sleep 5
-            .tailscale-wrapped up
-            .tailscale-wrapped status
-            echo "echo 'Use cryptsetup-askpass to unlock!'" >> /root/.profile
-          '';
         };
         availableKernelModules = [
           "ip6_tables"
@@ -82,19 +71,45 @@
           "xt_LOG"
           "xt_tcpudp"
         ];
-        extraUtilsCommands = ''
-          copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscaled-wrapped
-          copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscale-wrapped
-          copy_bin_and_libs ${pkgs.iproute}/bin/ip
-          copy_bin_and_libs ${iptables-static}/bin/iptables
-          copy_bin_and_libs ${iptables-static}/bin/xtables-legacy-multi
-          copy_bin_and_libs ${pkgs.strace}/bin/strace
-        '';
-        postMountCommands = ''
-          # tear down tailscale
-          pkill .tailscaled-wrapped
-          .tailscaled-wrapped --cleanup
-        '';
+
+	systemd.services = {
+	  "ts-connect" = {
+	    description = "Connect to Tailscale";
+	    after = [ "network-online.target" ];
+	    before = [ "local-fs.target" ];
+	    wants = [ "network-online.target" ];
+	    wantedBy = [ "local-fs.target" ];
+	    script = ''
+              copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscaled-wrapped
+              copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscale-wrapped
+              copy_bin_and_libs ${pkgs.iproute}/bin/ip
+              copy_bin_and_libs ${iptables-static}/bin/iptables
+              copy_bin_and_libs ${iptables-static}/bin/xtables-legacy-multi
+              copy_bin_and_libs ${pkgs.strace}/bin/strace
+
+              echo 'nameserver 8.8.8.8' > /etc/resolv.conf
+              mkdir /dev/net
+              mknod /dev/net/tun c 10 200
+              .tailscaled-wrapped 2>/dev/null &
+              sleep 5
+              .tailscale-wrapped up
+              .tailscale-wrapped status
+              echo "echo 'Use cryptsetup-askpass to unlock!'" >> /root/.profile
+	    '';
+	  };
+
+	  "ts-disconnect" = {
+	    description = "Disconnect from Tailscale";
+	    after = [ "local-fs.target" ];
+	    before = [ "sysinit.target" ];
+	    wants = [ "local-fs.target" ];
+	    wantedBy = [ "sysinit.target" ];
+	    script = ''
+	      pkill .tailscaled-wrapped
+	      .tailscaled-wrapped --cleanup
+	    '';
+	  };
+	};
       };
     };
 }
