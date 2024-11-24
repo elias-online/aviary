@@ -18,7 +18,7 @@
       primary = "/dev/disk/by-id/ata-PNY_CS1311_120GB_SSD_PNY121601207901005F9";
     })
 
-    (import ./hardware/pigeon.nix {
+    (import ./hardware/vpn.nix {
       tskey = config.sops.secrets.seagull-ts-key.path;
     })
   ];
