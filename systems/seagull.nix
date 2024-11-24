@@ -43,8 +43,10 @@
     clevis = {
       enable = true;
       useTang = true;
-      devices."/dev/disk/by-partlabel/disk-primary-root".secretFile = /clevis.jwe;
+      devices."/dev/disk/by-uuid/714f4270-ad00-42b1-b8ec-77a764fa2480".secretFile = /clevis.jwe;
     };
+
+    luks.devices."luksbtrfs".device = "/dev/disk/by-uuid/714f4270-ad00-42b1-b8ec-77a764fa2480";
   }; 
 
   boot.kernelModules = [ "kvm-intel" ];
