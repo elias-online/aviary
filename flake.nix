@@ -75,6 +75,7 @@
 	    environment = "desktop";
 	  })
 
+	  ./services/tang.nix
 	];
       };
 
