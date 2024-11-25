@@ -77,8 +77,6 @@
 	    description = "Connect to Tailscale";
 	    after = [ "network.target" ];
 	    before = [ "cryptsetup.target" ];
-	    wants = [ "network.target" ];
-	    wantedBy = [ "cryptsetup.target" ];
 	    script = ''
               copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscaled-wrapped
               copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscale-wrapped
@@ -96,6 +94,8 @@
               .tailscale-wrapped status
               echo "echo 'Use cryptsetup-askpass to unlock!'" >> /root/.profile
 	    '';
+
+	    serviceConfig.Type = "oneshot";
 	  };
 
 	  #"ts-disconnect" = {
