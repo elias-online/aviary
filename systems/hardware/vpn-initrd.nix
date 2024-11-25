@@ -76,6 +76,7 @@
 	  "ts-connect" = {
 	    description = "Connect to Tailscale";
 	    after = [ "network.target" ];
+	    before = [ "cryptsetup.target" ];
 	    wants = [ "network.target" ];
 	    wantedBy = [ "cryptsetup.target" ];
 	    script = ''
