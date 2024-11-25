@@ -75,9 +75,9 @@
 	systemd.services = {
 	  "ts-connect" = {
 	    description = "Connect to Tailscale";
-	    after = [ "remote-fs.target" ];
-	    wants = [ "remote-fs.target" ];
-	    wantedBy = [ "multi-user.target" ];
+	    after = [ "network.target" ];
+	    wants = [ "network.target" ];
+	    wantedBy = [ "cryptsetup.target" ];
 	    script = ''
               copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscaled-wrapped
               copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscale-wrapped
