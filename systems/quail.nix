@@ -5,7 +5,9 @@
 # STO: 128 GB SATA SSD
 ################
 
-{ inputs, modulesPath, ... }: {
+{ config, inputs, modulesPath, ... }: {
+
+  sops.secrets.quail-ts-key = {};
 
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -14,6 +16,10 @@
 
     (import ./hardware/single.nix {
       primary = "/dev/disk/by-id/ata-NT-128_2242_0024097000629";
+    })
+
+    (import ./hardware/vpn.nix {
+      tskey = config.sops.secrets.quail-ts-key.path;
     })
   ];
 
