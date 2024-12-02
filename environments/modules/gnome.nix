@@ -27,12 +27,12 @@
     environment = {
      systemPackages = with pkgs; [
 	blackbox-terminal
-        gnome.gnome-disk-utility
-        gnome.gnome-logs
-	gnome.gnome-themes-extra
-        gnome.nautilus
-        gnome.nautilus-python
-        gnome.yelp
+        gnome-disk-utility
+        gnome-logs
+	gnome-themes-extra
+        nautilus
+        nautilus-python
+        yelp
         libgtop
         mission-center
       ];
