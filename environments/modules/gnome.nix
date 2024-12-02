@@ -40,7 +40,7 @@
       #enable nautilus extensions
       pathsToLink = [ "/share/nautilus-python/extensions" ];
       sessionVariables.NAUTILUS_4_EXTENSION_DIR =
-        "${pkgs.gnome.nautilus-python}/lib/nautilus/extensions-4";
+        "${pkgs.nautilus-python}/lib/nautilus/extensions-4";
 
       variables.GI_TYPELIB_PATH = "/run/current-system/sw/lib/girepository-1.0"; #for tophat ext
     };
