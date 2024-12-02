@@ -78,7 +78,6 @@ in {
 	home.packages = with pkgs; lib.mkIf config.desktop.enable [
 	  davinci-resolve-studio
 	  gnome-tweaks
-	  librewolf
 	  neovim-gtk
 	];
       };
