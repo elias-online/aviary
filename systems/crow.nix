@@ -7,7 +7,7 @@
 # WFI: Intel AX210NGW
 ################
 
-{ config, inputs, modulesPath, ... }: {
+{ config, inputs, lib, modulesPath, ... }: {
 
   sops.secrets.crow-ts-key = {};
 
@@ -42,4 +42,6 @@
   system.stateVersion = "24.05";
   networking.hostName = "crow";
   time.timeZone = "America/Denver";
+
+  hardware.nvidia.open = lib.mkForce false;
 }

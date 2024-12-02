@@ -9,12 +9,12 @@
       clapper
       evince
       gnome-text-editor
-      gnome.gnome-calculator
-      gnome.gnome-calendar
-      gnome.gnome-clocks
-      gnome.gnome-contacts
-      gnome.gnome-tweaks
-      gnome.gnome-weather
+      gnome-calculator
+      gnome-calendar
+      gnome-clocks
+      gnome-contacts
+      gnome-tweaks
+      gnome-weather
       loupe
       snapshot
     ];

@@ -5,7 +5,7 @@
   config = lib.mkIf config.gnome.enable {
 
     environment.gnome.excludePackages = with pkgs; [ #removes default extensions
-      gnome.gnome-shell-extensions
+      gnome-shell-extensions
     ];
 
     services = {
@@ -27,12 +27,12 @@
     environment = {
      systemPackages = with pkgs; [
 	blackbox-terminal
-        gnome.gnome-disk-utility
-        gnome.gnome-logs
-	gnome.gnome-themes-extra
-        gnome.nautilus
-        gnome.nautilus-python
-        gnome.yelp
+        gnome-disk-utility
+        gnome-logs
+	gnome-themes-extra
+        nautilus
+        nautilus-python
+        yelp
         libgtop
         mission-center
       ];
@@ -40,7 +40,7 @@
       #enable nautilus extensions
       pathsToLink = [ "/share/nautilus-python/extensions" ];
       sessionVariables.NAUTILUS_4_EXTENSION_DIR =
-        "${pkgs.gnome.nautilus-python}/lib/nautilus/extensions-4";
+        "${pkgs.nautilus-python}/lib/nautilus/extensions-4";
 
       variables.GI_TYPELIB_PATH = "/run/current-system/sw/lib/girepository-1.0"; #for tophat ext
     };
