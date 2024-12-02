@@ -42,4 +42,6 @@
   system.stateVersion = "24.05";
   networking.hostName = "crow";
   time.timeZone = "America/Denver";
+
+  hardware.nvidia.open = lib.mkForce false;
 }
