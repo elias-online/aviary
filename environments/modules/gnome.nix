@@ -5,7 +5,7 @@
   config = lib.mkIf config.gnome.enable {
 
     environment.gnome.excludePackages = with pkgs; [ #removes default extensions
-      gnome.gnome-shell-extensions
+      gnome-shell-extensions
     ];
 
     services = {
