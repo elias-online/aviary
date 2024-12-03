@@ -19,7 +19,7 @@
     
     "org/gnome/shell/extensions/paperwm" = {
       show-window-position-bar = false;
-      selection-border-size = 5;
+      selection-border-size = 0;
       window-gap = 10;
       horizontal-margin = 10;
       vertical-margin = 10;
