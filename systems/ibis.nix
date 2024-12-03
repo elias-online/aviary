@@ -94,5 +94,5 @@
  
   system.stateVersion = "24.05";
   networking.hostName = "ibis";
-  time.timeZone = "America/Denver";
+  time.timeZone = "America/Los_Angeles";
 }
