@@ -8,7 +8,7 @@
 # MON: Samsung 3440x1440 100Hz
 #################
 
-{ inputs, modulesPath, ... }: {
+{ config, inputs, modulesPath, ... }: {
 
   sops.secrets.cardinal-ts-key = {};
 
