@@ -9,10 +9,20 @@ in {
       defaultSopsFile = "${secrets}/secrets/elias.yaml";
       secrets = {
         password-hash.neededForUsers = true;
+	cardinal-ssh-key = if builtins.toString config.networking.hostName == "cardinal" then {
+	  mode = "0600";
+	  owner = "elias";
+	  path = "/home/elias/.ssh/id_ed25519";
+	} else {};
 	ibis-ssh-key = if builtins.toString config.networking.hostName == "ibis" then {
 	  mode = "0600";
 	  owner = "elias";
 	  path = "/home/elias/.ssh/id_ed25519";
+	} else {};
+	seagull-ssh-key = if builtins.toString config.networking.hostName == "seagull" then {
+	  mode = "0600";
+	  owner = "elias";
+	  path = "/home/elias/.ssh/id_ed24419";
 	} else {};
       };
     };
