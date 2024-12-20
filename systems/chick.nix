@@ -1,6 +1,7 @@
 { config, inputs, modulesPath, ... }: {
 
   sops.secrets.chick-ts-key = {};
+  sops.secrets.chick-ts-initrd = {};
 
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -14,6 +15,8 @@
     (import ./hardware/vpn.nix {
       tskey = config.sops.secrets.chick-ts-key.path;
     })
+    
+    ./hardware/vpn-initrd.nix
   ];
 
   boot.initrd.availableKernelModules = [
@@ -28,4 +31,9 @@
   system.stateVersion = "24.11";
   networking.hostName = "chick";
   time.timeZone = "America/Los_Angeles";
+
+  remote-machine.boot.tailscaleUnlock = {
+    enable = true;
+    tailscaleStatePath = config .sops.secrets.chick-ts-initrd.path;
+  };
 }
