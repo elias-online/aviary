@@ -34,6 +34,6 @@
 
   remote-machine.boot.tailscaleUnlock = {
     enable = true;
-    tailscaleStatePath = config .sops.secrets.chick-ts-initrd.path;
+    tailscaleStatePath = config.sops.secrets.chick-ts-initrd.path;
   };
 }
