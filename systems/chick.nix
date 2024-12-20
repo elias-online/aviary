@@ -1,4 +1,4 @@
-{ inputs, modulesPath, ... }: {
+{ config, inputs, modulesPath, ... }: {
 
   sops.secrets.chick-ts-key = {};
 
