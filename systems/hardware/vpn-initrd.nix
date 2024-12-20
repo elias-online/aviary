@@ -75,8 +75,12 @@
 	systemd.services = {
 	  "ts-connect" = {
 	    description = "Connect to Tailscale";
-	    after = [ "network.target" ];
 	    before = [ "cryptsetup.target" ];
+	    wantedBy = [ "sysinit.target" ];
+	    unitConfig = {
+	      DefaultDependencies = "no";
+	      AssertPathExists = "/etc/initrd-release";
+	    };
 	    script = ''
               copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscaled-wrapped
               copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscale-wrapped
