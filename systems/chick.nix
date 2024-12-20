@@ -1,5 +1,7 @@
 { inputs, modulesPath, ... }: {
 
+  sops.secrets.chick-ts-key = {};
+
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     inputs.hardware.nixosModules.common-cpu-intel
@@ -7,6 +9,10 @@
 
     (import ./hardware/single.nix {
       primary = "/dev/disk/by-id/ata-SanDisk_SD8SN8U-512G-1006_172330802078"; #Silver Test Laptop
+    })
+
+    (import ./hardware/vpn.nix {
+      tskey = config.sops.secrets.chick-ts-key.path;
     })
   ];
 
