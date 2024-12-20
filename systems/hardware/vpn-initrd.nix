@@ -82,12 +82,12 @@
 	      AssertPathExists = "/etc/initrd-release";
 	    };
 	    script = ''
-              copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscaled-wrapped
-              copy_bin_and_libs ${pkgs.tailscale}/bin/.tailscale-wrapped
-              copy_bin_and_libs ${pkgs.iproute2}/bin/ip
-              copy_bin_and_libs ${iptables-static}/bin/iptables
-              copy_bin_and_libs ${iptables-static}/bin/xtables-legacy-multi
-              copy_bin_and_libs ${pkgs.strace}/bin/strace
+              cp ${pkgs.tailscale}/bin/.tailscaled-wrapped /run/initramfs
+              cp ${pkgs.tailscale}/bin/.tailscale-wrapped /run/initramfs
+              cp ${pkgs.iproute2}/bin/ip /run/initramfs
+              cp ${iptables-static}/bin/iptables /run/initramfs
+              cp ${iptables-static}/bin/xtables-legacy-multi /run/initramfs
+              cp ${pkgs.strace}/bin/strace /run/initramfs
 
               echo 'nameserver 8.8.8.8' > /etc/resolv.conf
               mkdir /dev/net
