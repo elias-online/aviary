@@ -16,7 +16,7 @@
       tskey = config.sops.secrets.chick-ts-key.path;
     })
     
-    ./hardware/vpn-initrd.nix
+    ./hardware/vpn-initrd2.nix
   ];
 
   boot.initrd.availableKernelModules = [
@@ -32,8 +32,8 @@
   networking.hostName = "chick";
   time.timeZone = "America/Los_Angeles";
 
-  remote-machine.boot.tailscaleUnlock = {
-    enable = true;
-    tailscaleStatePath = config.sops.secrets.chick-ts-initrd.path;
-  };
+  #remote-machine.boot.tailscaleUnlock = {
+  #  enable = true;
+  #  tailscaleStatePath = config.sops.secrets.chick-ts-initrd.path;
+  #};
 }
