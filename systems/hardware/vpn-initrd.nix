@@ -72,6 +72,12 @@
           "xt_tcpudp"
         ];
 
+        systemd.packages = [
+	  pkgs.tailscale
+	  pkgs.iproute2
+	  pkgs.strace
+	];
+
 	systemd.services = {
 	  "ts-connect" = {
 	    description = "Connect to Tailscale";
@@ -82,12 +88,12 @@
 	      AssertPathExists = "/etc/initrd-release";
 	    };
 	    script = ''
-              cp ${pkgs.tailscale}/bin/.tailscaled-wrapped /run/initramfs
-              cp ${pkgs.tailscale}/bin/.tailscale-wrapped /run/initramfs
-              cp ${pkgs.iproute2}/bin/ip /run/initramfs
-              cp ${iptables-static}/bin/iptables /run/initramfs
-              cp ${iptables-static}/bin/xtables-legacy-multi /run/initramfs
-              cp ${pkgs.strace}/bin/strace /run/initramfs
+              #cp ${pkgs.tailscale}/bin/.tailscaled-wrapped /run/initramfs
+              #cp ${pkgs.tailscale}/bin/.tailscale-wrapped /run/initramfs
+              #cp ${pkgs.iproute2}/bin/ip /run/initramfs
+              #cp ${iptables-static}/bin/iptables /run/initramfs
+              #cp ${iptables-static}/bin/xtables-legacy-multi /run/initramfs
+              #cp ${pkgs.strace}/bin/strace /run/initramfs
 
               echo 'nameserver 8.8.8.8' > /etc/resolv.conf
               mkdir /dev/net
