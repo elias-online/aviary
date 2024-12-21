@@ -16,8 +16,9 @@
       tskey = config.sops.secrets.chick-ts-key.path;
     })
     
-    ./hardware/vpn-initrd2.nix
-    ./hardware/boot.nix
+    ./hardware/initrd-test.nix
+    #./hardware/vpn-initrd2.nix
+    #./hardware/boot.nix
   ];
 
   boot.initrd.availableKernelModules = [
