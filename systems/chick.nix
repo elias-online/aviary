@@ -17,6 +17,7 @@
     })
     
     ./hardware/vpn-initrd2.nix
+    ./hardware/boot.nix
   ];
 
   boot.initrd.availableKernelModules = [
