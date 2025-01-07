@@ -26,7 +26,7 @@
 
     environment = {
      systemPackages = with pkgs; [
-	blackbox-terminal
+	ghostty
         gnome-disk-utility
         gnome-logs
 	gnome-themes-extra
@@ -47,7 +47,7 @@
 
     programs.nautilus-open-any-terminal = {
       enable = true;
-      terminal = "blackbox";
+      terminal = "ghostty";
     };
   };
 }
