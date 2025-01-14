@@ -266,11 +266,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1736684107,
-        "narHash": "sha256-vH5mXxEvZeoGNkqKoCluhTGfoeXCZ1seYhC2pbMN0sg=",
+        "lastModified": 1736754065,
+        "narHash": "sha256-hcETjfECLklW1ND8svDvN0Nw6H/1qtuoz3rbFNQ1Lrk=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "635e887b48521e912a516625eee7df6cf0eba9c1",
+        "rev": "67e9c880898889470f153157a96b595e758167fc",
         "type": "github"
       },
       "original": {
@@ -347,10 +347,10 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1734383433,
-        "narHash": "sha256-jB7uUkWZt7uZDVvCDVoOsSVyftCptovWs5dJZBINQ6E=",
+        "lastModified": 1735927974,
+        "narHash": "sha256-f5gyd82winNc1ZZRvzfoZ9TkY2UAKAweBJ0d/CzJ4Xk=",
         "ref": "refs/heads/main",
-        "rev": "979e79effb14e769ffbd8aff6f2c6ab98f955a72",
+        "rev": "a523c35d008b32aad2ccab9be7e67a6b0db69882",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/elias-online/aviarySecretsElias.git"
