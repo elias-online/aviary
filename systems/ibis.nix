@@ -11,7 +11,7 @@
   sops.secrets.ibis-ts-key = {};
 
   sops.secrets.egg-ssh-host.owner = "elias";
-  sops.secrets.egg-ssh-host.initrd.owner = "elias";
+  sops.secrets.egg-ssh-host-initrd.owner = "elias";
   sops.secrets.egg-ts.owner = "elias";
   sops.secrets.egg-ts-initrd.owner = "elias";
 
