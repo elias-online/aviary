@@ -15,6 +15,9 @@
   sops.secrets.egg-ts.owner = "elias";
   sops.secrets.egg-ts-initrd.owner = "elias";
 
+  sops.secrets.egg-ssh-host-initrd.path = "/run/secrets/ssh-host-initrd";
+  sops.secrets.egg-ts-initrd.path = "/run/secrets/ts-initrd";
+
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     inputs.hardware.nixosModules.microsoft-surface-pro-intel
