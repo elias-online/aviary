@@ -10,10 +10,6 @@
 
   sops.secrets.ibis-ts-key = {};
 
-  sops.secrets.egg-ssh-host.owner = "elias";
-  sops.secrets.egg-ssid.owner = "elias";
-  sops.secrets.egg-ssid-psk.owner = "elias";
-
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     inputs.hardware.nixosModules.microsoft-surface-pro-intel
