@@ -14,9 +14,8 @@
   sops.secrets.egg-ssh-host-initrd.owner = "elias";
   sops.secrets.egg-ts.owner = "elias";
   sops.secrets.egg-ts-initrd.owner = "elias";
-
-  sops.secrets.egg-ssh-host-initrd.path = "/run/secrets/ssh-host-initrd";
-  sops.secrets.egg-ts-initrd.path = "/run/secrets/ts-initrd";
+  sops.secrets.ssh-host-initrd.owner = "elias";
+  sops.secrets.ts-initrd.owner = "elias";
 
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
