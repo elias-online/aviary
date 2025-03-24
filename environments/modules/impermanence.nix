@@ -47,6 +47,7 @@
 
         umount /btrfs_tmp
         echo "Impermanence script ending"
+        echo "changed 3-24"
       '';
 
       serviceConfig.Type = "oneshot";
@@ -65,6 +66,7 @@
 
       files = [
         "/etc/machine-id"
+        "/var/keys/age_host_key"
         #{ file = "/var/keys/age_host_key"; parentDirectory = { mode = "u=rwx,g=,o="; }; }
       ];
     };
