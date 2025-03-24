@@ -33,17 +33,18 @@
             done
             btrfs subvolume delete "$1"
         }
-
-        for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +14); do
-            delete_subvolume_recursively "$i"
-        done
-
+ 
         btrfs subvolume create /btrfs_tmp/root
         mkdir -p /btrfs_tmp/root/etc/ssh
         cp "/btrfs_tmp/old_roots/$timestamp/etc/ssh/ssh_host_ed25519_key" \
             /btrfs_tmp/root/etc/ssh/ssh_host_ed25519_key
         cp "/btrfs_tmp/old_roots/$timestamp/etc/ssh/ssh_host_ed25519_key.pub" \
             /btrfs_tmp/root/etc/ssh/ssh_host_ed25519_key.pub
+
+	for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +14); do
+            delete_subvolume_recursively "$i"
+        done
+
         umount /btrfs_tmp
         echo "Impermanence script ending"
       '';
