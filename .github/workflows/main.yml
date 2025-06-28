@@ -1,0 +1,29 @@
+name: update-dependencies
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * *'
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v12
+      - name: configure ssh
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AVIARYSECRETSELIAS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H github.com >> ~/.ssh/knownhosts
+      - id: update
+        uses: DeterminateSystems/update-flake-lock@v24
+        with:
+          inputs: disko hardware home-manager impermanence nixpkgs nixvim sops-nix
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+      ### TO AUTOMERGE
+      #- name: Merge
+      #  run: gh pr merge --auto "${{ steps.update.outputs.pull-request-number }}" --rebase
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  if: ${{ steps.update.outputs.pull-request-number != '' }}
