@@ -20,6 +20,11 @@
       url = "github:nix-community/impermanence";
     };
 
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     secrets = {
       url = "git+ssh://git@github.com/elias-online/aviarySecrets.git";
       flake = false;
@@ -60,6 +65,7 @@
           inputs.disko.nixosModules.default
           inputs.home-manager.nixosModules.default
           inputs.impermanence.nixosModules.impermanence
+          inputs.lanzaboote.nixosModules.lanzaboote
           inputs.sops-nix.nixosModules.sops
           ./environments/modules/bootstrap.nix
           ./environments/modules/default.nix
@@ -100,28 +106,21 @@
 	      ];
       };
 
-      /*
-      headless = _: {
-        imports = [
-          self.nixosModules.remote
-          ./services/sshinitrd.nix
-          ./services/vpninitrd.nix
-        ];
-      };
-      */
-
       minimal = _: {
         imports = [
           self.nixosModules.default
-          self.nixosModules.remote #headless
-          ./environments/modules/update.nix
+          self.nixosModules.remote
+          ./environments/modules/secureboot.nix
+          ./environments/modules/update.nix 
         ];
       };
 
       recovery = _: {
         imports = [
-          self.nixosModules.minimal
+          self.nixosModules.default
+          self.nixosModules.remote 
           ./environments/modules/recovery.nix
+          ./environments/modules/update.nix
         ];
       };
 
