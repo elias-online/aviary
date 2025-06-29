@@ -13,5 +13,9 @@
         pkiBundle = "/var/lib/sbctl";
       };
     };
+
+    environment.persistence."/persist".directories = [
+      "/var/lib/sbctl"
+    ];
   };
 }

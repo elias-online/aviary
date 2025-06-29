@@ -66,4 +66,22 @@ sudo btrfs qgroup show -r /
 nix-collect-garbage -d
 ```
 
+# SECUREBOOT NOTES
 
+### HP Key Import Process
+
+```
+nix-shell -p sbsigntool efitools
+sudo sbctl create-keys
+sudo cert-to-efi-sig-list -g "$(uuidgen)" /var/lib/sbctl/keys/PK/PK.pem /var/lib/sbctl/keys/PK/PK.esl
+sudo cert-to-efi-sig-list -g "$(uuidgen)" /var/lib/sbctl/keys/KEK/KEK.pem /var/lib/sbctl/keys/KEK/KEK.esl
+sudo cert-to-efi-sig-list -g "$(uuidgen)" /var/lib/sbctl/keys/db/db.pem /var/lib/sbctl/keys/db/db.esl
+
+sudo rm -rf /boot/EFI/HP
+sudo mkdir -p /boot/EFI/HP
+sudo sign-efi-sig-list -k /var/lib/sbctl/keys/PK/PK.key -c /var/lib/sbctl/keys/PK/PK.pem PK  /var/lib/sbctl/keys/PK/PK.esl /boot/EFI/HP/PK.bin
+sudo sign-efi-sig-list -k /var/lib/sbctl/keys/PK/PK.key -c /var/lib/sbctl/keys/PK/PK.pem KEK  /var/lib/sbctl/keys/KEK/KEK.esl /boot/EFI/HP/KEK.bin
+sudo sign-efi-sig-list -k /var/lib/sbctl/keys/KEK/KEK.key -c /var/lib/sbctl/keys/KEK/KEK.pem db  /var/lib/sbctl/keys/db/db.esl /boot/EFI/HP/DB.bin
+```
+
+Import custom secureboot keys via UEFI
