@@ -29,7 +29,7 @@
         desktopManager.gnome.enable = true;
       };
 
-      gnome.core-utilities.enable = false; #removes default apps
+      gnome.core-apps.enable = false;
     };
 
     #GDM autologin config--may crash if the first two lines aren't present

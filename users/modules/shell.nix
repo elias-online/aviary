@@ -8,7 +8,7 @@
   config = {
     fonts.fontconfig.enable = true;
 
-    home.packages = [(pkgs.nerdfonts.override {fonts = ["SourceCodePro"];})];
+    home.packages = [ pkgs.nerd-fonts.sauce-code-pro ];
 
     dconf.settings = {
       "org/gnome/desktop/interface" = {
