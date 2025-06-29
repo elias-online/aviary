@@ -17,7 +17,21 @@ in {
       secrets = {
         "email-git" = defaultPerms;
         "username-git" = defaultPerms;
+
+        "ibis-drive-primary" = defaultPerms;
+        "ibis-luks-hash" = defaultPerms;
+        "ibis-ssh-admin" = defaultPerms;
+        "ibis-ssh-admin-pub" = defaultPerms;
+        "ibis-ssh-host" = defaultPerms;
+        "ibis-ssh-host-initrd" = defaultPerms;
+        "ibis-ssh-user" = {
+          mode = "0400";
+          owner = config.users.users."1000".name;
+          group = "admin";
+        };
         "ibis-ssh-user-pub" = defaultPerms;
+        "ibis-ts" = defaultPerms;
+        "ibis-ts-initrd" = defaultPerms;
 
         # Below this are managed secrets
 	      "chicken-drive-primary" = defaultPerms;
