@@ -110,14 +110,17 @@
         imports = [
           self.nixosModules.default
           self.nixosModules.remote
-          ./environments/modules/update.nix 
+          ./environments/modules/secureboot.nix
+          ./environments/modules/update.nix
         ];
       };
 
       recovery = _: {
         imports = [
-          self.nixosModules.minimal 
+          self.nixosModules.default
+          self.nixosMOdules.remote
           ./environments/modules/recovery.nix
+          ./environments/modules/update.nix
         ];
       };
 
