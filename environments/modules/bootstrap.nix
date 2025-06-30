@@ -21,14 +21,14 @@
           configurationLimit = 15;
           consoleMode = "max";
           editor = false;
-        };
-
-        lanzaboote = {
-          enable = true;
-          pkiBundle = "/var/lib/sbctl";
-        };
+        }; 
 
         efi.canTouchEfiVariables = true;
+      };
+
+      lanzaboote = {
+        enable = true;
+        pkiBundle = "/var/lib/sbctl";
       };
 
       initrd.systemd.enable = true;
