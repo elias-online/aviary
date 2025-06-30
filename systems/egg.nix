@@ -58,7 +58,6 @@
       "zd1211rw"
       "b43"
       "p54usb"
-      "orinoco"
     ];
  
     networking.hostName = "egg";
