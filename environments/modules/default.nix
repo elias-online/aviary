@@ -223,11 +223,14 @@ in {
     environment.systemPackages = [
       pkgs.age
       pkgs.disko
+      pkgs.efitools
       pkgs.git
       pkgs.jq
       pkgs.linux-firmware
       pkgs.nixos-anywhere
       pkgs.rsync
+      pkgs.sbctl
+      pkgs.sbsigntool
       pkgs.sops
       pkgs.ssh-to-age
 

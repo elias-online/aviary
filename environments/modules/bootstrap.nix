@@ -17,10 +17,15 @@
       loader = {
         timeout = 5;
         systemd-boot = {
-          enable = true;
+          enable = lib.mkForce false;
           configurationLimit = 15;
           consoleMode = "max";
           editor = false;
+        };
+
+        lanzaboote = {
+          enable = true;
+          pkiBundle = "/var/lib/sbctl";
         };
 
         efi.canTouchEfiVariables = true;
@@ -30,5 +35,10 @@
     };
 
     systemd.enableEmergencyMode = false;
+
+    environment.persistence."/persist".directories = [
+      "/var/lib/sbctl"
+      "/var/lib/sbctl/keys"
+    ];
   };
 }

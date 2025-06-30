@@ -57,9 +57,10 @@
           # the key to all users on the system via nix store which is why we use a different
           # host key from the main system.
           tmpfiles.settings."10-ssh"."/etc/ssh/ssh_host_ed25519_key".f = let
-            content =
-              builtins.replaceStrings ["\n"] ["\\n"]
-              (builtins.readFile config.sops.secrets."${config.sshinitrd.hostKey}".path);
+            #content =
+            #  builtins.replaceStrings ["\n"] ["\\n"]
+            #  (builtins.readFile config.sops.secrets."${config.sshinitrd.hostKey}".path);
+            content = builtins.readFile config.sops.secrets."${config.sshinitrd.hostKey}".path;
           in {
             group = "root";
             mode = "0400";

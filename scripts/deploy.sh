@@ -214,6 +214,12 @@ confirmation
 cp /run/secrets/"${config}"-ssh-host /tmp/aviary-extra-files/persist/etc/ssh/ssh_host_ed25519_key
 chmod 0400 /tmp/aviary-extra-files/persist/etc/ssh/ssh_host_ed25519_key
 
+if [[ "$config" != "egg" ]]; then
+  mkdir -p /tmp/aviary-extra-files/persist/var/lib
+  ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "sbctl create-keys"
+  scp -r root@$target:/var/lib/sbctl tmp/aviary-extra-files/persist/var/lib
+fi
+
 ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "printf '%s' '$luksHash' > /luks-key"
 
 luksHashRecovery=$(cat /run/secrets/"$config"-luks-hash)
