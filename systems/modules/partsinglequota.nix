@@ -29,7 +29,7 @@ in {
             settings = {
               allowDiscards = true;
               fallbackToPassword = false; # Doesn't seem to modify /etc/crypttab in initrd
-              keyfile = "/luks-key";
+              keyFile = "/luks-key";
             };
             additionalKeyFiles = [ "/luks-key-recovery" ];
             content = {
