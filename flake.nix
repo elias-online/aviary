@@ -118,7 +118,7 @@
       recovery = _: {
         imports = [
           self.nixosModules.default
-          self.nixosMOdules.remote
+          self.nixosModules.remote
           ./environments/modules/recovery.nix
           ./environments/modules/update.nix
         ];
