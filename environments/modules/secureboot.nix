@@ -3,7 +3,7 @@
   config = {
 
     boot = {
-      loaders.systemd-boot = lib.mkForce false;
+      loader.systemd-boot = lib.mkForce false;
 
       lanzaboote = {
         enable = true;
