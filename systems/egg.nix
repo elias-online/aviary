@@ -66,7 +66,7 @@
 
     nixpkgs.hostPlatform = "x86_64-linux";
     nixpkgs.config.allowUnfree = true;
-    system.stateVersion = "24.11";
-    home-manager.users."1000".home.stateVersion = "24.11";
+    system.stateVersion = "25.05";
+    home-manager.users."1000".home.stateVersion = "25.05";
   };
 }
