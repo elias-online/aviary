@@ -201,7 +201,7 @@ cleanup() {
     fi
 
     if [[ -e "/tmp/aviary-extra-files" ]]; then
-	rm -rf /tmp/aviary-extra-files
+	      rm -rf /tmp/aviary-extra-files
     fi
 }
 
@@ -214,12 +214,6 @@ confirmation
 cp /run/secrets/"${config}"-ssh-host /tmp/aviary-extra-files/persist/etc/ssh/ssh_host_ed25519_key
 chmod 0400 /tmp/aviary-extra-files/persist/etc/ssh/ssh_host_ed25519_key
 
-if [[ "$config" != "egg" ]]; then
-  mkdir -p /tmp/aviary-extra-files/persist/var/lib
-  ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "sbctl create-keys"
-  scp -r root@$target:/var/lib/sbctl /tmp/aviary-extra-files/persist/var/lib
-fi
-
 ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "printf '%s' '$luksHash' > /luks-key"
 
 luksHashRecovery=$(cat /run/secrets/"$config"-luks-hash)
@@ -230,6 +224,13 @@ ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "mkdir -p /mnt"
 if [[ "$config" == "egg" ]]; then
     echo ${drive} | tee /tmp/egg-drive >/dev/null
     < /dev/urandom tr -dc 'A-Za-z0-9' | head -c 10 > /tmp/egg-drive-name
+else
+    mkdir -p /tmp/aviary-extra-files/persist/var/lib
+    mkdir -p /tmp/aviary-extra-files/var/lib
+    ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "sbctl create-keys"
+    scp -r root@$target:/var/lib/sbctl /tmp/aviary-extra-files/persist/var/lib
+    ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "rm -rf /var/lib/sbctl" #may need to not do this
+    cp -r /tmp/aviary-extra-files/persist/var/lib/sbctl /tmp/aviary-extra-files/var/lib
 fi
 
 if [[ "$target" == "localhost" ]]; then
