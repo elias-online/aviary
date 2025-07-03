@@ -15,5 +15,7 @@
       dates = "02:00";
       randomizedDelaySec = "45min";
     };
+
+    services.fwupd.enable = true;
   };
 }
