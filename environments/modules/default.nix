@@ -105,6 +105,11 @@ in {
           unitConfig.DefaultDependencies = "no";
 
           preStart = ''
+
+            if [ -e "/var/lib/systemd/tpm2-srk-public-key.pem" ]; then
+                exit 0
+            fi
+
             passwordHash=""
             luksHash=""
             while [[ "$passwordHash" != '${passwordHash}' && "$luksHash" != '${luksHash}' ]]; do

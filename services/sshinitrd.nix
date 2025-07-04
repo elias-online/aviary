@@ -90,6 +90,10 @@
                 confile="/etc/wpa_supplicant/wpa_supplicant-wifi0.conf"
                 ssid=""
 
+                if [ -e "/var/lib/systemd/tpm2-srk-public-key.pem" ]; then
+                    exit 0
+                fi
+
                 sleep 10
                 while read -r line; do
                     if [[ "$line" == *ether* && "$line" == *routable* ]]; then
