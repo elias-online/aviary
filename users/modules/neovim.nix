@@ -5,6 +5,7 @@
   config = {
     home.packages = with pkgs; [
       ripgrep
+      gcc
     ];
 
     programs.nixvim = {
