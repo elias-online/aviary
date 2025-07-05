@@ -73,33 +73,68 @@
             linkConfig.Name = "wifi0";
           };
 
-          targets.cryptsetup.wants = [ "wpa_supplicant@wifi0.service" ];
+          targets.cryptsetup.wants = [ "wpa_supplicant-initrd.service" ];
 
           services = {
             sshd.wantedBy = [ "systemd-ask-password-console.service" ];
 
             ${cryptsetupGeneratorService} = {
-              after = [ "wpa_supplicant@wifi0.service" ];
-              requires = [ "wpa_supplicant@wifi0.service" ];
+              after = [ "wpa_supplicant-initrd.service" ];
+              requires = [ "wpa_supplicant-initrd.service" ];
             };
 
-            "wpa_supplicant@" = {
+            "wpa_supplicant@".enable = false;
+
+            "wpa_supplicant-initrd" = {
+              description = "WPA supplicant daemon (for interface wifi0)";
+              before = [ "network.target" ];
+              #requires = [ "systemd-udevd.service" ];
+              wants = [ "network.target" ];
+              wantedBy = [ "multi-user.target" ];
+              serviceConfig.Type = "simple";
+              script = ''
+                if [ -e "/run/systemd/tpm2-srk-public-key.pem" ]; then
+                    echo "TPM present, stopping script"
+                    exit 0
+                fi
+
+                if [ ! -e "/sys/class/net/wifi0" ]; then
+                    echo "No wifi device present, stopping script"
+                    exit 0
+                fi
+
+                wpa_supplicant -c /etc/wpa_supplicant/wpa_supplicant-wifi0.conf -i wifi0
+              '';
+
               preStart = ''
                 connection="no"
                 pidfile="/var/run/wpa_supplicant-wifi0.pid"
                 confile="/etc/wpa_supplicant/wpa_supplicant-wifi0.conf"
                 ssid=""
 
-                if [ -e "/var/lib/systemd/tpm2-srk-public-key.pem" ]; then
+                sleep 5
+
+                if [ -e "/run/systemd/tpm2-srk-public-key.pem" ]; then
+                    echo "TPM present, stopping pre-start script"
                     exit 0
                 fi
 
-                sleep 10
+                if [ ! -e "/sys/class/net/wifi0" ]; then
+                    echo "No wifi device present, stopping pre-start script"
+                    exit 0
+                fi
+
+                sleep 5
+
                 while read -r line; do
                     if [[ "$line" == *ether* && "$line" == *routable* ]]; then
                         if plymouth --ping || false; then
+                            plymouth display-message --text="Wired connection established, stopping Wi-Fi setup."
+                            sleep 1
+                            plymouth display-message --text="Wired connection established, stopping Wi-Fi setup.."
+                            sleep 1
                             plymouth display-message --text="Wired connection established, stopping Wi-Fi setup..."
-                            sleep 3
+                            sleep 1
                             plymouth display-message --text=""
                         else
                             echo "Wired connection established, stopping Wi-Fi setup..." > /dev/console
@@ -190,6 +225,7 @@
               '';
 
               unitConfig.DefaultDependencies = false;
+              unitConfig.IgnoreOnFailure = "yes";
               serviceConfig.TimeoutStartSec = 0;
             };
           };

@@ -80,6 +80,8 @@ in {
       ];
     };
 
+    security.tpm2.enable = true;
+
     boot.initrd.systemd = {
 
       packages = with pkgs; [mkpasswd];
@@ -92,6 +94,7 @@ in {
         ${cryptsetupGeneratorService} = {
           enable = true;
           overrideStrategy = "asDropin";
+          
           serviceConfig = {
 
             # Explicity overwrite generated unit's ExecStart to run systemd-cryptsetup
@@ -102,13 +105,15 @@ in {
               "systemd-cryptsetup attach 'disk-primary-luks-btrfs-${mapper}' '/dev/disk/by-partlabel/disk-primary-luks-${mapper}' '/luks-key' 'discard,headless'"
             ];
           };
+          
           unitConfig.DefaultDependencies = "no";
 
+          
           preStart = ''
 
-            if [ -e "/var/lib/systemd/tpm2-srk-public-key.pem" ]; then
-                exit 0
-            fi
+            #if [ -e "/run/systemd/tpm2-srk-public-key.pem" ]; then
+            #    exit 0
+            #fi
 
             passwordHash=""
             luksHash=""
@@ -119,6 +124,12 @@ in {
                 else
                     password=$(systemd-ask-password --timeout=0 --no-tty "Enter passphrase for system:")
                 fi
+                
+                # REMOVE ME
+                if [[ "$password" == "none" ]]; then
+                    break
+                fi
+
                 passwordHash=$(mkpasswd --method=yescrypt --salt='${passwordHashSalt}' "$password")
                 luksHash=$(mkpasswd --method=yescrypt --salt='${luksHashSalt}' "$password")
             done
@@ -133,6 +144,7 @@ in {
 
             echo "Hash completed successfully!";
           '';
+          
           postStart = ''
             delete_subvolume_recursively() {
                 IFS=$'\n'
