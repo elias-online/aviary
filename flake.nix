@@ -223,6 +223,7 @@
           self.nixosModules.graphical
           ./systems/ibis.nix
           ./users/00.nix
+          ./environments/modules/debug.nix
         ];
       };
     };
