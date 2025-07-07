@@ -1,14 +1,14 @@
 {
   config,
   inputs,
-  pkgs,
   ...
 }: {
-  config = {
-    imports = [
-      inputs.hardware.nixosModules.common-gpu-nvidia-nonprime
-    ];
+  
+  imports = [
+    inputs.hardware.nixosModules.common-gpu-nvidia-nonprime
+  ];
 
+  config = { 
     boot.kernelParams = ["nvidia-drm.fbdev=1"];
 
     hardware.nvidia = {

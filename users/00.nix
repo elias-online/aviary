@@ -33,6 +33,22 @@ in {
         "ibis-ts" = defaultPerms;
         "ibis-ts-initrd" = defaultPerms;
 
+        "cardinal-drive-primary" = defaultPerms;
+        "cardinal-drive-secondary" = defaultPerms;
+        "cardinal-luks-hash" = defaultPerms;
+        "cardinal-ssh-admin" = defaultPerms;
+        "cardinal-ssh-admin-pub" = defaultPerms;
+        "cardinal-ssh-host" = defaultPerms;
+        "cardinal-ssh-host-initrd" = defaultPerms;
+	      "cardinal-ssh-user" = {
+	        mode = "0400";
+	        owner = config.users.users."1000".name;
+	        group = "admin";
+	      };
+        "cardinal-ssh-user-pub" = defaultPerms;
+        "cardinal-ts" = defaultPerms;
+        "cardinal-ts-initrd" = defaultPerms;
+
         # Below this are managed secrets
 	      "chicken-drive-primary" = defaultPerms;
         "chicken-luks-hash" = defaultPerms;
@@ -113,7 +129,7 @@ in {
 
         home.packages = with pkgs;
           lib.mkIf config.default.graphical [
-            davinci-resolve-studio
+            # davinci-resolve-studio
             gnome-tweaks
             neovim-gtk
           ];

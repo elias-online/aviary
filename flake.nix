@@ -226,6 +226,16 @@
           ./environments/modules/debug.nix
         ];
       };
+
+      "cardinal" = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs;};
+        modules = [
+          { system.stateVersion = "25.05"; }
+          self.nixosModules.default
+          ./systems/cardinal.nix
+          ./users/00.nix
+        ];
+      };
     };
   };
 }

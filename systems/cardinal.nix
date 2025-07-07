@@ -28,13 +28,13 @@
     sops.secrets = {
       "cardinal-drive-primary" = {
         mode = "0440";
-	owner = config.users.users."1000".name;
-	group = "admin";
+      	owner = config.users.users."1000".name;
+	      group = "admin";
       };
       "cardinal-drive-secondary" = {
         mode = "0440";
-	owner = config.users.users."1000".name;
-	group = "admin";
+	      owner = config.users.users."1000".name;
+	      group = "admin";
       };
     };
  
@@ -54,7 +54,7 @@
 
     nixpkgs.hostPlatform = "x86_64-linux";
     nixpkgs.config.allowUnfree = true;
-    system.stateVersion = "24.05";
-    home-manager.users."1000".home.stateVersion = "24.05";
+    # system.stateVersion = "24.05";
+    home-manager.users."1000".home.stateVersion = config.system.stateVersion;
   };
 }
