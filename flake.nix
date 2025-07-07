@@ -232,6 +232,7 @@
         modules = [
           { system.stateVersion = "25.05"; }
           self.nixosModules.default
+          self.nixosModules.debug # TODO REMOVE ME
           ./systems/cardinal.nix
           ./users/00.nix
         ];
