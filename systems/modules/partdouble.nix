@@ -20,9 +20,9 @@ in {
         ExecStart = [
           ""
           "systemd-cryptsetup attach 'disk-secondary-luks-btrfs-${hostname}' '/dev/disk/by-partlabel/disk-secondary-luks-${hostname}' '/luks-key' 'discard,headless'"
-        ];
-        unitConfig.DefaultDependencies = "no";
+        ]; 
       };
+      unitConfig.DefaultDependencies = "no";
     };
   };
 
