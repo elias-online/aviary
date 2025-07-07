@@ -363,11 +363,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1751848537,
-        "narHash": "sha256-eayYykf8xs9yZEl/FhPZ6Gdg79prk/4U8MU2GWyu4g0=",
+        "lastModified": 1751853743,
+        "narHash": "sha256-GNrUOJwq1amYJX5cDBQNF844VC75uTWivynx6b4SqQQ=",
         "ref": "refs/heads/main",
-        "rev": "0cc337f8ac26768a4a2e6ea2ad14a8d4970a87a8",
-        "revCount": 82,
+        "rev": "52c4b17da4aef1339707c3042c1c4f087f45140c",
+        "revCount": 83,
         "type": "git",
         "url": "ssh://git@github.com/elias-online/aviarySecrets.git"
       },
