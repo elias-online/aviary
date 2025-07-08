@@ -20,7 +20,8 @@
 
     ./modules/nvidia.nix
 
-    ./modules/partdouble.nix
+    #./modules/partdouble.nix
+    ./modules/partsinglequota.nix
   ];
 
   config = {
