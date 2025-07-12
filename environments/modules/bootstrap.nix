@@ -2,23 +2,38 @@
   config,
   lib,
   ...
-}: {
+}:
+
+let
+  inherit (lib)
+    mkForce
+    mkIf
+    mkOption
+    ;
+
+  inherit (lib.types)
+    bool
+    ;
+
+in {
+
   options.bootstrap = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
+    
+    enable = mkOption {
+      type = bool;
       default = true;
       example = false;
       description = "enable bootstrap";
     };
   };
 
-  config = lib.mkIf config.bootstrap.enable {
-    boot = {
+  config = mkIf config.bootstrap.enable {
+    
+    boot = { 
       loader = {
         timeout = 5;
         systemd-boot = {
-          enable = lib.mkForce false; #true;
-          configurationLimit = 15;
+          enable = mkForce false; # Using Lanzaboote
           consoleMode = "max";
           editor = false;
         }; 
