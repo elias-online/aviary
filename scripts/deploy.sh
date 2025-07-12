@@ -220,7 +220,7 @@ ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "printf '%s' '$luksHashRec
 
 ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "mkdir -p /mnt"
 
-sbctl create-keys --disable-landlock -e /tmp/aviary-extra-files/var/lib/sbctl/keys -d /tmp/aviary-extra-files/var/lib/sbctl
+sbctl create-keys --disable-landlock -e /tmp/aviary-extra-files/var/lib/sbctl/keys -d /tmp/aviary-extra-files/var/lib/sbctl/GUID
 mkdir -p /tmp/aviary-extra-files/persist/var/lib
 cp -r /tmp/aviary-extra-files/var/lib/sbctl /tmp/aviary-extra-files/persist/var/lib
 
