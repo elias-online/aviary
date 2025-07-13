@@ -75,11 +75,13 @@
       description = "SOPS-Nix secret storing the user SSH private key";
     };
 
-    usernameSecret = lib.mkOption {
-      type = lib.types.str;
-      default = "username";
-      example = "user-username";
-      description = "SOPS-Nix secret storing the user username";
+    secrets = {
+      usernameSecret = lib.mkOption {
+        type = lib.types.str;
+        default = "username";
+        example = "user-username";
+        description = "SOPS-Nix secret storing the user username";
+      };
     }; 
   };
 
@@ -172,7 +174,7 @@
           path = "/home/1000/.ssh/id_ed25519";
         };
 
-        "${config.aviary.usernameSecret}" = defaultPerms;
+        "${config.aviary.secrets.usernameSecret}" = defaultPerms;
       };
     };
 
@@ -450,7 +452,7 @@
       let
         username =
           builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.aviary.usernameSecret}".path);
+          (builtins.readFile config.sops.secrets."${config.aviary.secrets.usernameSecret}".path);
         description =
           builtins.replaceStrings ["\n"] [""]
           (builtins.readFile config.sops.secrets."${config.aviary.descriptionSecret}".path);
