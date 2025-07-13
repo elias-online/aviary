@@ -69,7 +69,7 @@
           inputs.sops-nix.nixosModules.sops
           ./environments/modules/bootstrap.nix
           ./environments/modules/default.nix
-          ./environments/modules/usersbase.nix
+          #./environments/modules/usersbase.nix
         ];
       };
 
