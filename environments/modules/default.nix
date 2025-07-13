@@ -6,77 +6,78 @@
   ...
 }: {
 
-  options.aviary = {
-
-    descriptionSecret = lib.mkOption {
-      type = lib.types.str;
-      default = "description";
-      example = "user-description";
-      description = "SOPS-Nix secret storing the user description";
-    };
+  options.aviary = { 
     
     graphical = lib.mkOption {
       type = lib.types.bool;
       default = false;
       example = true;
       description = "Graphical environment flag";
-    };
-    
-    luksHashSecret = lib.mkOption {
-      type = lib.types.str;
-      default = config.networking.hostName + "-luks-hash";
-      example = "hostname-luks-hash";
-      description = "SOPS-Nix secret storing the recovery hash for LUKS";
-    };
-    
-    # This is state that should be stored on the system
-    # and should be removed eventually.
-    luksHashSecretPrevious = lib.mkOption {
-      type = lib.types.str;
-      default = config.networking.hostName + "-luks-hash-previous";
-      example = "hostname-luks-hash-previous";
-      description = "SOPS-Nix secret storing the previous recovery hash for LUKS";
-    };
-
-    passwordHashSecret = lib.mkOption {
-      type = lib.types.str;
-      default = "password-hash";
-      example = "user-password-hash";
-      description = "SOPS-Nix secret storing the user password hash";
-    };
-
-    # This is state that should be stored on the system
-    # and should be removed eventually.
-    passwordHashPreviousSecret = lib.mkOption {
-      type = lib.types.str;
-      default = "password-hash-previous";
-      example = "user-password-hash-previous";
-      description = "SOPS-Nix secret storing the user previous password hash";
-    };
-
-    sshAdminSecret = lib.mkOption {
-      type = lib.types.str;
-      default = config.networking.hostName + "-ssh-admin";
-      example = "hostname-ssh-admin";
-      description = "SOPS-Nix secret storing the admin SSH private key";
-    };
-
-    sshAdminPubSecret = lib.mkOption {
-      type = lib.types.str;
-      default = config.networking.hostName + "-ssh-admin-pub";
-      example = "hostname-ssh-admin-pub";
-      description = "SOPS-Nix secret storing the admin SSH public key";
-    };
-
-    sshUserSecret = lib.mkOption {
-      type = lib.types.str;
-      default = config.networking.hostName + "-ssh-user";
-      example = "hostname-ssh-user";
-      description = "SOPS-Nix secret storing the user SSH private key";
-    };
+    }; 
 
     secrets = {
-      usernameSecret = lib.mkOption {
+
+      description = lib.mkOption {
+        type = lib.types.str;
+        default = "description";
+        example = "user-description";
+        description = "SOPS-Nix secret storing the user description";
+      };
+
+      luksHash = lib.mkOption {
+        type = lib.types.str;
+        default = config.networking.hostName + "-luks-hash";
+        example = "hostname-luks-hash";
+        description = "SOPS-Nix secret storing the recovery hash for LUKS";
+      };
+    
+      # This is state that should be stored on the system
+      # and should be removed eventually.
+      luksHashPrevious = lib.mkOption {
+        type = lib.types.str;
+        default = config.networking.hostName + "-luks-hash-previous";
+        example = "hostname-luks-hash-previous";
+        description = "SOPS-Nix secret storing the previous recovery hash for LUKS";
+      };
+
+      passwordHash = lib.mkOption {
+        type = lib.types.str;
+        default = "password-hash";
+        example = "user-password-hash";
+        description = "SOPS-Nix secret storing the user password hash";
+      };
+
+      # This is state that should be stored on the system
+      # and should be removed eventually.
+      passwordHashPrevious = lib.mkOption {
+        type = lib.types.str;
+        default = "password-hash-previous";
+        example = "user-password-hash-previous";
+        description = "SOPS-Nix secret storing the user previous password hash";
+      };
+
+      sshAdmin = lib.mkOption {
+        type = lib.types.str;
+        default = config.networking.hostName + "-ssh-admin";
+        example = "hostname-ssh-admin";
+        description = "SOPS-Nix secret storing the admin SSH private key";
+      };
+
+      sshAdminPub = lib.mkOption {
+        type = lib.types.str;
+        default = config.networking.hostName + "-ssh-admin-pub";
+        example = "hostname-ssh-admin-pub";
+        description = "SOPS-Nix secret storing the admin SSH public key";
+      };
+
+      sshUser = lib.mkOption {
+        type = lib.types.str;
+        default = config.networking.hostName + "-ssh-user";
+        example = "hostname-ssh-user";
+        description = "SOPS-Nix secret storing the user SSH private key";
+      };
+
+      username = lib.mkOption {
         type = lib.types.str;
         default = "username";
         example = "user-username";
@@ -101,13 +102,13 @@
   
     passwordHash =
       builtins.replaceStrings ["\n"] [""]
-      (builtins.readFile config.sops.secrets."${config.aviary.passwordHashSecret}".path);
+      (builtins.readFile config.sops.secrets."${config.aviary.secrets.passwordHash}".path);
   
     passwordHashSalt = builtins.head (builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" passwordHash);
   
     luksHash =
       builtins.replaceStrings ["\n"] [""]
-      (builtins.readFile config.sops.secrets."${config.aviary.luksHashSecret}".path);
+      (builtins.readFile config.sops.secrets."${config.aviary.secrets.luksHash}".path);
   
     luksHashSalt = builtins.head (builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" luksHash);
 
@@ -138,43 +139,43 @@
       
       secrets = {
 
-        "${config.aviary.descriptionSecret}" = defaultPerms;
+        "${config.aviary.secrets.description}" = defaultPerms;
         
-        "${config.aviary.luksHashSecret}" = defaultPerms;
+        "${config.aviary.secrets.luksHash}" = defaultPerms;
 
-        "${config.aviary.luksHashSecretPrevious}" = {
+        "${config.aviary.secrets.luksHashPrevious}" = {
           restartUnits = ["syncluksrecovery.service"];
           mode = "0440";
           owner = config.users.users."1000".name;
           group = "admin";
         }; 
 
-        "${config.aviary.passwordHashSecret}" = defaultPerms;
+        "${config.aviary.secrets.passwordHash}" = defaultPerms;
 
-        "${config.aviary.passwordHashPreviousSecret}" = {
+        "${config.aviary.secrets.passwordHashPrevious}" = {
           restartUnits = ["syncluks.service"];
           mode = "0440";
           owner = config.users.users."1000".name;
           group = "admin";
         };
 
-        "${config.aviary.sshAdminSecret}" = lib.mkForce {
+        "${config.aviary.secrets.sshAdmin}" = lib.mkForce {
           mode = "0400";
           owner = config.users.users."admin".name;
           group = "admin";
           path = "/home/admin/.ssh/id_ed25519";
         };
 
-        "${config.aviary.sshAdminPubSecret}" = defaultPerms;
+        "${config.aviary.secrets.sshAdminPub}" = defaultPerms;
         
-        "${config.aviary.sshUserSecret}" = lib.mkForce {
+        "${config.aviary.secrets.sshUser}" = lib.mkForce {
           mode = "0400";
           owner = config.users.users."1000".name;
           group = "admin";
           path = "/home/1000/.ssh/id_ed25519";
         };
 
-        "${config.aviary.secrets.usernameSecret}" = defaultPerms;
+        "${config.aviary.secrets.username}" = defaultPerms;
       };
     };
 
@@ -378,8 +379,8 @@
         };
 
         script = ''
-          oldKey=$(head -n1 ${config.sops.secrets."${config.aviary.luksHashSecretPrevious}".path})
-          newKey=$(head -n1 ${config.sops.secrets."${config.aviary.luksHashSecret}".path})
+          oldKey=$(head -n1 ${config.sops.secrets."${config.aviary.secrets.luksHashPrevious}".path})
+          newKey=$(head -n1 ${config.sops.secrets."${config.aviary.secrets.luksHash}".path})
           primaryDevice=$(/run/current-system/sw/bin/cryptsetup status "${primary}" \
               | grep device: | sed -n 's/^  device:  //p')
           secondaryDevice=$(/run/current-system/sw/bin/cryptsetup status "${secondary}" \
@@ -414,8 +415,8 @@
         };
 
         script = ''
-          oldKey=$(head -n1 ${config.sops.secrets."${config.aviary.passwordHashPreviousSecret}".path})
-          newKey=$(head -n1 ${config.sops.secrets."${config.aviary.passwordHashSecret}".path})
+          oldKey=$(head -n1 ${config.sops.secrets."${config.aviary.secrets.passwordHashPrevious}".path})
+          newKey=$(head -n1 ${config.sops.secrets."${config.aviary.secrets.passwordHash}".path})
           primaryDevice=$(/run/current-system/sw/bin/cryptsetup status "${primary}" \
               | grep device: | sed -n 's/^  device:  //p')
           secondaryDevice=$(/run/current-system/sw/bin/cryptsetup status "${secondary}" \
@@ -452,16 +453,16 @@
       let
         username =
           builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.aviary.secrets.usernameSecret}".path);
+          (builtins.readFile config.sops.secrets."${config.aviary.secrets.username}".path);
         description =
           builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.aviary.descriptionSecret}".path);
+          (builtins.readFile config.sops.secrets."${config.aviary.secrets.description}".path);
         passwordHash =
           builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.aviary.passwordHashSecret}".path);
+          (builtins.readFile config.sops.secrets."${config.aviary.secrets.passwordHash}".path);
         adminSSHPub =
           builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.aviary.sshAdminPubSecret}".path);
+          (builtins.readFile config.sops.secrets."${config.aviary.secrets.sshAdminPub}".path);
     
       in {
 
