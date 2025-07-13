@@ -453,7 +453,7 @@
           (builtins.readFile config.sops.secrets."${config.aviary.usernameSecret}".path);
         description =
           builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.ariary.descriptionSecret}".path);
+          (builtins.readFile config.sops.secrets."${config.aviary.descriptionSecret}".path);
         passwordHash =
           builtins.replaceStrings ["\n"] [""]
           (builtins.readFile config.sops.secrets."${config.aviary.passwordHashSecret}".path);
