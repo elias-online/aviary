@@ -409,37 +409,21 @@
       "syncluks" = {
         enable = true;
         description = "Syncronize luks passkey with user password";
-        serviceConfig = {
+        serviceConfig =
+        
+        let
+          script = (pkgs.writeShellScript "syncluks" ''${ builtins.readFile ../../scripts/systemd/syncluks.sh }'');
+          hashPathOld = config.sops.secrets."${config.aviary.secrets.passwordHashPrevious}".path;
+          hashPathNew = config.sops.secrets."${config.aviary.secrets.passwordHash}".path;
+          drivePartlabelPrimary = primary;
+          drivePartlabelSecondary = secondary;
+        in {
+
+          Type = "oneshot";
           StandardOutput = "null";
           StandardError = "null";
+          ExecStart = "${script} ${hashPathOld} ${hashPathNew} ${drivePartlabelPrimary} ${drivePartlabelSecondary}";
         };
-
-        script = ''
-          oldKey=$(head -n1 ${config.sops.secrets."${config.aviary.secrets.passwordHashPrevious}".path})
-          newKey=$(head -n1 ${config.sops.secrets."${config.aviary.secrets.passwordHash}".path})
-          primaryDevice=$(/run/current-system/sw/bin/cryptsetup status "${primary}" \
-              | grep device: | sed -n 's/^  device:  //p')
-          secondaryDevice=$(/run/current-system/sw/bin/cryptsetup status "${secondary}" \
-              | grep device: | sed -n 's/^  device:  //p')
-
-          printf "%s" "$oldKey" > /tmp/luks-key-old
-          chmod 0400 /tmp/luks-key-old
-          printf "%s" "$newKey" > /tmp/luks-key-new
-          chmod 0400 /tmp/luks-key-new
-
-          /run/current-system/sw/bin/cryptsetup luksAddKey "$primaryDevice" --key-file /tmp/luks-key-old < /tmp/luks-key-new
-          /run/current-system/sw/bin/cryptsetup luksRemoveKey "$primaryDevice" --key-file /tmp/luks-key-old
-
-          if [ -n "$secondaryDevice" ]; then
-              /run/current-system/sw/cryptsetup luksAddKey "$secondaryDevice" --key-file /tmp/luks-key-old < /tmp/luks-key-new
-              /run/current-system/sw/cryptsetup luksRemoveKey "$secondaryDevice" --key-file /tmp/luks-key-old
-          fi
-
-          rm -f /tmp/luks-key-old
-          rm -f /tmp/luks-key-new
-        '';
-
-        serviceConfig.Type = "oneshot";
       };
     };
 
