@@ -1,26 +1,28 @@
-HASH_PATH_OLD=$1 #${config.sops.secrets."${config.aviary.secrets.passwordHashPrevious}".path}
-HASH_PATH_NEW=$2 #${config.sops.secrets."${config.aviary.secrets.passwordHash}".path}
-DRIVE_PARTLABEL_PRIMARY=$3   #${primary}
-DRIVE_PARTLABEL_SECONDARY=$4 #${secondary}
+#!/bin/sh
 
-KEY_OLD=$(head -n1 "$HASH_PATH_OLD")
-KEY_NEW=$(head -n1 "$HASH_PATH_NEW")
-DRIVE_PRIMARY=$(/run/current-system/sw/bin/cryptsetup status "$DRIVE_PARTLABEL_PRIMARY" \
+hash_path_old=$1
+hash_path_new=$2
+drive_partlabel_primary=$3
+drive_partlabel_secondary=$4
+
+key_old=$(head -n1 "$hash_path_old")
+key_new=$(head -n1 "$hash_path_new")
+drive_primary=$(/run/current-system/sw/bin/cryptsetup status "$drive_partlabel_primary" \
     | grep device: | sed -n 's/^  device:  //p')
-DRIVE_SECONDARY=$(/run/current-system/sw/bin/cryptsetup status "$DRIVE_PARTLABEL_SECONDARY" \
+drive_secondary=$(/run/current-system/sw/bin/cryptsetup status "$drive_partlabel_secondary" \
     | grep device: | sed -n 's/^  device:  //p')
 
-printf "%s" "$KEY_OLD" > /tmp/luks-key-old
+printf "%s" "$key_old" > /tmp/luks-key-old
 chmod 0400 /tmp/luks-key-old
-printf "%s" "$KEY_NEW" > /tmp/luks-key-new
+printf "%s" "$key_new" > /tmp/luks-key-new
 chmod 0400 /tmp/luks-key-new
 
-/run/current-system/sw/bin/cryptsetup luksAddKey "$DRIVE_PRIMARY" --key-file /tmp/luks-key-old < /tmp/luks-key-new
-/run/current-system/sw/bin/cryptsetup luksRemoveKey "$DRIVE_PRIMARY" --key-file /tmp/luks-key-old
+/run/current-system/sw/bin/cryptsetup luksAddKey "$drive_primary" --key-file /tmp/luks-key-old < /tmp/luks-key-new
+/run/current-system/sw/bin/cryptsetup luksRemoveKey "$drive_primary" --key-file /tmp/luks-key-old
 
-if [ -n "$DRIVE_SECONDARY" ]; then
-    /run/current-system/sw/cryptsetup luksAddKey "$DRIVE_SECONDARY" --key-file /tmp/luks-key-old < /tmp/luks-key-new
-    /run/current-system/sw/cryptsetup luksRemoveKey "$DRIVE_SECONDARY" --key-file /tmp/luks-key-old
+if [ -n "$drive_secondary" ]; then
+    /run/current-system/sw/cryptsetup luksAddKey "$drive_secondary" --key-file /tmp/luks-key-old < /tmp/luks-key-new
+    /run/current-system/sw/cryptsetup luksRemoveKey "$drive_secondary" --key-file /tmp/luks-key-old
 fi
 
 rm -f /tmp/luks-key-old

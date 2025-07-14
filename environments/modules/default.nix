@@ -104,13 +104,13 @@
       builtins.replaceStrings ["\n"] [""]
       (builtins.readFile config.sops.secrets."${config.aviary.secrets.passwordHash}".path);
   
-    passwordHashSalt = builtins.head (builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" passwordHash);
+    #passwordHashSalt = builtins.head (builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" passwordHash);
   
     luksHash =
       builtins.replaceStrings ["\n"] [""]
       (builtins.readFile config.sops.secrets."${config.aviary.secrets.luksHash}".path);
   
-    luksHashSalt = builtins.head (builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" luksHash);
+    #luksHashSalt = builtins.head (builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" luksHash);
 
     defaultPerms = {
       mode = "0440";
@@ -206,11 +206,20 @@
 
         systemd-ask-password-console.wantedBy = ["cryptsetup.target"];
 
-        ${cryptsetupGeneratorService} = {
+        ${cryptsetupGeneratorService} =
+        
+        let
+          execStartPre = (pkgs.writeShellScript "luksshim" ''${ builtins.readFile ../../scripts/systemd/luksshim.sh }'');
+          execStartPost = (pkgs.writeShellScript "impermanence" ''${ builtins.readFile ../../scripts/systemd/impermanence.sh }'');
+          mapperDevice = "disk-primary-luks-btrfs-${mapper}";
+        in {
+          
           enable = true;
           overrideStrategy = "asDropin";
           
           serviceConfig = {
+
+            ExecStartPre = "${execStartPre} ${passwordHash} ${luksHash}";
 
             # Explicity overwrite generated unit's ExecStart to run systemd-cryptsetup
             # in headless mode to prevent password fallback as Disko settings.fallbackToPassword = false
@@ -219,79 +228,11 @@
               ""
               "systemd-cryptsetup attach 'disk-primary-luks-btrfs-${mapper}' '/dev/disk/by-partlabel/disk-primary-luks-${mapper}' '/luks-key' 'discard,headless'"
             ];
+            
+            ExecStartPost = "${execStartPost} ${mapperDevice}";
           };
           
-          unitConfig.DefaultDependencies = "no";
-
-          
-          preStart = ''
-
-            #if [ -e "/run/systemd/tpm2-srk-public-key.pem" ]; then
-            #    exit 0
-            #fi
-
-            passwordHash=""
-            luksHash=""
-            while [[ "$passwordHash" != '${passwordHash}' && "$luksHash" != '${luksHash}' ]]; do
-                sleep 3
-                if plymouth --ping || false; then
-                    password=$(systemd-ask-password --timeout=0 --no-tty "Enter passphrase for system")
-                else
-                    password=$(systemd-ask-password --timeout=0 --no-tty "Enter passphrase for system:")
-                fi 
-
-                passwordHash=$(mkpasswd --method=yescrypt --salt='${passwordHashSalt}' "$password")
-                luksHash=$(mkpasswd --method=yescrypt --salt='${luksHashSalt}' "$password")
-            done
-
-            rm -f /luks-key
-            printf "%s" "$passwordHash" > /luks-key
-            chmod 0400 /luks-key
-
-            rm -f /luks-key-recovery
-            printf "%s" "$luksHash" > /luks-key-recovery
-            chmod 0400 /luks-key-recovery
-
-            echo "Hash completed successfully!";
-          '';
-          
-          postStart = ''
-            delete_subvolume_recursively() {
-                IFS=$'\n'
-                for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
-                    delete_subvolume_recursively "/btrfs_tmp/$i"
-                done
-                btrfs subvolume delete "$1"
-            }
-
-            luksdevice="/dev/mapper/disk-primary-luks-btrfs-${mapper}"
-          
-            mkdir /btrfs_tmp
-            mount "$luksdevice" /btrfs_tmp
-
-            if [[ -e /btrfs_tmp/root ]]; then
-                mkdir -p /btrfs_tmp/old_roots
-                timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
-                mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
-            fi
-
-            for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +14); do
-                delete_subvolume_recursively "$i"
-            done
-
-            btrfs subvolume create /btrfs_tmp/root
-            
-            # Hand off recovery wifi credentials
-            if [[ -e "/btrfs_tmp/persist/wpa_supplicant-wifi0.conf" ]]; then
-                rm /btrfs_tmp/persist/wpa_supplicant-wifi0.conf
-            fi
-            if [[ -e "/etc/wpa_supplicant/wpa_supplicant-wifi0.conf" ]]; then
-                cp /etc/wpa_supplicant/wpa_supplicant-wifi0.conf /btrfs_tmp/persist/wpa_supplicant-wifi0.conf
-            fi
-            
-            umount /btrfs_tmp
-            echo "Impermanence completed successfully!";
-          '';
+          unitConfig.DefaultDependencies = "no"; 
         };
       };
     };
@@ -363,67 +304,54 @@
       }; 
     }; 
 
-    systemd.tmpfiles.rules = [
-      "d /home/1000/.ssh 0700 ${config.users.users."1000".name} users -"
-      "d /home/admin/.ssh 0700 admin admin -"
-    ];
-
-    systemd.services = {
+    systemd = {
       
-      "syncluksrecovery" = {
-        enable = true;
-        description = "Syncronize luks recovery password";
-        serviceConfig = {
-          StandardOutput = "null";
-          StandardError = "null";
+      tmpfiles.rules = [
+        "d /home/1000/.ssh 0700 ${config.users.users."1000".name} users -"
+        "d /home/admin/.ssh 0700 admin admin -"
+      ];
+
+      services = 
+    
+      let
+        execStart = (pkgs.writeShellScript "syncluks" ''${ builtins.readFile ../../scripts/systemd/syncluks.sh }'');
+        drivePartlabelPrimary = primary;
+        drivePartlabelSecondary = secondary;
+      in {
+
+        "syncluks" = {
+          enable = true;
+          description = "Syncronize LUKS password with user password";
+          serviceConfig =
+          
+          let 
+            hashPathOld = config.sops.secrets."${config.aviary.secrets.passwordHashPrevious}".path;
+            hashPathNew = config.sops.secrets."${config.aviary.secrets.passwordHash}".path; 
+          in {
+
+            ExecStart = "${execStart} ${hashPathOld} ${hashPathNew} ${drivePartlabelPrimary} ${drivePartlabelSecondary}";
+            StandardError = "null";
+            StandardOutput = "null"; 
+            Type = "oneshot"; 
+          };
         };
+      
+        "syncluksrecovery" = {
+          enable = true;
+          description = "Syncronize LUKS recovery password";
+          serviceConfig =
+          
+          let
+            hashPathOld = config.sops.secrets."${config.aviary.secrets.luksHashPrevious}".path;
+            hashPathNew = config.sops.secrets."${config.aviary.secrets.luksHash}".path; 
+          in {
 
-        script = ''
-          oldKey=$(head -n1 ${config.sops.secrets."${config.aviary.secrets.luksHashPrevious}".path})
-          newKey=$(head -n1 ${config.sops.secrets."${config.aviary.secrets.luksHash}".path})
-          primaryDevice=$(/run/current-system/sw/bin/cryptsetup status "${primary}" \
-              | grep device: | sed -n 's/^  device:  //p')
-          secondaryDevice=$(/run/current-system/sw/bin/cryptsetup status "${secondary}" \
-              | grep device: | sed -n 's/^  device:  //p')
-
-          printf "%s" "$oldKey" > /tmp/luks-key-old
-          chmod 0400 /tmp/luks-key-old
-          printf "%s" "$newKey" > /tmp/luks-key-new
-          chmod 0400 /tmp/luks-key-new
-
-          /run/current-system/sw/bin/cryptsetup luksAddKey "$primaryDevice" --key-file /tmp/luks-key-old < /tmp/luks-key-new
-          /run/current-system/sw/bin/cryptsetup luksRemoveKey "$primaryDevice" --key-file /tmp/luks-key-old
-
-          if [ -n "$secondaryDevice" ]; then
-              /run/current-system/sw/cryptsetup luksAddKey "$secondaryDevice" --key-file /tmp/luks-key-old < /tmp/luks-key-new
-              /run/current-system/sw/cryptsetup luksRemoveKey "$secondaryDevice" --key-file /tmp/luks-key-old
-          fi
-
-          rm -f /tmp/luks-key-old
-          rm -f /tmp/luks-key-new
-        '';
-
-        serviceConfig.Type = "oneshot";
-      };
-
-      "syncluks" = {
-        enable = true;
-        description = "Syncronize luks passkey with user password";
-        serviceConfig =
-        
-        let
-          script = (pkgs.writeShellScript "syncluks" ''${ builtins.readFile ../../scripts/systemd/syncluks.sh }'');
-          hashPathOld = config.sops.secrets."${config.aviary.secrets.passwordHashPrevious}".path;
-          hashPathNew = config.sops.secrets."${config.aviary.secrets.passwordHash}".path;
-          drivePartlabelPrimary = primary;
-          drivePartlabelSecondary = secondary;
-        in {
-
-          Type = "oneshot";
-          StandardOutput = "null";
-          StandardError = "null";
-          ExecStart = "${script} ${hashPathOld} ${hashPathNew} ${drivePartlabelPrimary} ${drivePartlabelSecondary}";
-        };
+            ExecStart = "${execStart} ${hashPathOld} ${hashPathNew} ${drivePartlabelPrimary} ${drivePartlabelSecondary}";
+            StandardError = "null";
+            StandardOutput = "null"; 
+            Type = "oneshot";
+          };
+        }; 
       };
     };
 
