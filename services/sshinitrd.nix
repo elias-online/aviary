@@ -88,8 +88,8 @@
             "wpa_supplicant-initrd" = 
             
             let
-              execStart = (pkgs.writeShellScript "initrdwificonnect" ''${ builtins.readFile ../../scripts/systemd/initrdwificonnect.sh }'');
-              execStartPre = (pkgs.writeShellScript "initrdwifisetup" ''${ builtins.readFile ../../scripts/systemd/initrdwifisetup.sh }'');
+              execStart = (pkgs.writeShellScript "initrdwificonnect" ''${ builtins.readFile ../scripts/systemd/initrdwificonnect.sh }'');
+              execStartPre = (pkgs.writeShellScript "initrdwifisetup" ''${ builtins.readFile ../scripts/systemd/initrdwifisetup.sh }'');
             in {
 
               description = "WPA supplicant daemon (for interface wifi0)";
