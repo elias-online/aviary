@@ -3,7 +3,7 @@
 hash_check_password=$1
 hash_check_recovery=$2
 
-regex='^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$'
+regex='^(\$y\$[^$]+\$[^$]+)\$[^$]+'
 if [[ $hash_check_password =~ $regex ]]; then
   salt_check_password=${BASH_REMATCH[0]}
 else
