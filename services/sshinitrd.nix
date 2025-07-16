@@ -40,12 +40,17 @@
           };
         };
 
-        systemd = let
+        systemd =
+
+        let
+          tmpfileContent = builtins.readFile config.sops.secrets."${config.sshinitrd.hostKey}".path;
           mapper =
             if builtins.pathExists /tmp/egg-drive-name
             then builtins.replaceStrings ["\n"] [""] (builtins.readFile /tmp/egg-drive-name)
             else config.networking.hostName;
           cryptsetupGeneratorService = "systemd-cryptsetup@disk\\x2dprimary\\x2dluks\\x2dbtrfs\\x2d" + mapper;
+          wpaExecStart = (pkgs.writeShellScript "initrdwificonnect" ''${ builtins.readFile ../scripts/systemd/initrdwificonnect.sh }'');
+          wpaExecStartPre = (pkgs.writeShellScript "initrdwifisetup" ''${ builtins.readFile ../scripts/systemd/initrdwifisetup.sh }'');
         in {
 
           packages = [ pkgs.wpa_supplicant ];
@@ -56,16 +61,11 @@
           # Copy ssh host key into initrd. This has the unfortunate side effect of exposing
           # the key to all users on the system via nix store which is why we use a different
           # host key from the main system.
-          tmpfiles.settings."10-ssh"."/etc/ssh/ssh_host_ed25519_key".f =
-          
-          let
-            content = builtins.readFile config.sops.secrets."${config.sshinitrd.hostKey}".path;
-          in {
-
+          tmpfiles.settings."10-ssh"."/etc/ssh/ssh_host_ed25519_key".f = {
             group = "root";
             mode = "0400";
             user = "root";
-            argument = content;
+            argument = tmpfileContent;
           };
 
           network.links."10-wifi" = {
@@ -85,20 +85,14 @@
 
             "wpa_supplicant@".enable = false;
 
-            "wpa_supplicant-initrd" = 
-            
-            let
-              execStart = (pkgs.writeShellScript "initrdwificonnect" ''${ builtins.readFile ../scripts/systemd/initrdwificonnect.sh }'');
-              execStartPre = (pkgs.writeShellScript "initrdwifisetup" ''${ builtins.readFile ../scripts/systemd/initrdwifisetup.sh }'');
-            in {
-
+            "wpa_supplicant-initrd" = {
               description = "WPA supplicant daemon (for interface wifi0)";
               before = [ "network.target" ];
               wants = [ "network.target" ];
               wantedBy = [ "multi-user.target" ];
               serviceConfig = {
-                ExecStartPre = "${execStartPre}";
-                ExecStart = "${execStart}";
+                ExecStartPre = "${wpaExecStartPre}";
+                ExecStart = "${wpaExecStart}";
                 TimeoutStartSec = 0;
                 Type = "simple";
               };  
@@ -109,6 +103,11 @@
               };
             };
           };
+
+          storePaths = [
+            wpaExecStart
+            wpaExecStartPre
+          ];
         };
       };
     };

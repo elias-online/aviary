@@ -197,7 +197,13 @@
 
     #security.tpm2.enable = true;
 
-    boot.initrd.systemd = {
+    boot.initrd.systemd = 
+
+    let
+      cryptExecStartPre = (pkgs.writeShellScript "luksshim" ''${ builtins.readFile ../../scripts/systemd/luksshim.sh }'');
+      cryptExecStartPost = (pkgs.writeShellScript "impermanence" ''${ builtins.readFile ../../scripts/systemd/impermanence.sh }'');
+      mapperDevice = "disk-primary-luks-btrfs-${mapper}";
+    in {
 
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
@@ -206,20 +212,14 @@
 
         systemd-ask-password-console.wantedBy = ["cryptsetup.target"];
 
-        ${cryptsetupGeneratorService} =
-        
-        let
-          execStartPre = (pkgs.writeShellScript "luksshim" ''${ builtins.readFile ../../scripts/systemd/luksshim.sh }'');
-          execStartPost = (pkgs.writeShellScript "impermanence" ''${ builtins.readFile ../../scripts/systemd/impermanence.sh }'');
-          mapperDevice = "disk-primary-luks-btrfs-${mapper}";
-        in {
+        ${cryptsetupGeneratorService} = {
           
           enable = true;
           overrideStrategy = "asDropin";
           
           serviceConfig = {
 
-            ExecStartPre = "${execStartPre} ${passwordHash} ${luksHash}";
+            ExecStartPre = "${cryptExecStartPre} ${passwordHash} ${luksHash}";
 
             # Explicity overwrite generated unit's ExecStart to run systemd-cryptsetup
             # in headless mode to prevent password fallback as Disko settings.fallbackToPassword = false
@@ -229,12 +229,17 @@
               "systemd-cryptsetup attach 'disk-primary-luks-btrfs-${mapper}' '/dev/disk/by-partlabel/disk-primary-luks-${mapper}' '/luks-key' 'discard,headless'"
             ];
             
-            ExecStartPost = "${execStartPost} ${mapperDevice}";
+            ExecStartPost = "${cryptExecStartPost} ${mapperDevice}";
           };
           
           unitConfig.DefaultDependencies = "no"; 
         };
       };
+
+      storePaths = [
+        cryptExecStartPre
+        cryptExecStartPost
+      ];
     };
 
     security.sudo = {
@@ -311,8 +316,8 @@
         "d /home/admin/.ssh 0700 admin admin -"
       ];
 
-      services = 
-    
+      services =
+      
       let
         execStart = (pkgs.writeShellScript "syncluks" ''${ builtins.readFile ../../scripts/systemd/syncluks.sh }'');
         drivePartlabelPrimary = primary;
