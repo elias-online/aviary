@@ -5,13 +5,13 @@ hash_check_recovery=$2
 
 regex='^(\$y\$[^$]+\$[^$]+)\$[^$]+'
 if [[ $hash_check_password =~ $regex ]]; then
-  salt_check_password=${BASH_REMATCH[0]}
+  salt_check_password=${BASH_REMATCH[1]}
 else
   echo "No salt matched for hash_check_password, exiting..."
   exit 1
 fi
 if [[ $hash_check_recovery =~ $regex ]]; then
-  salt_check_recovery=${BASH_REMATCH[0]}
+  salt_check_recovery=${BASH_REMATCH[1]}
 else
   echo "No salt matched for hash_check_recovery, exiting..."
   exit 1
