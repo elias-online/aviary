@@ -7,4 +7,4 @@ if [ -e "/dev/mapper/$mapper_device" ]; then
     exit 0
 fi
 
-systemd-cryptsetup attach "$mapper_device" "/dev/disk/by-partlabel/$disk_device" /luks-key discard,headless;
+systemd-cryptsetup attach "$mapper_device" "/dev/disk/by-partlabel/$disk_device" /luks-key discard,headless; || echo "/luks-key is incorrect, could not attach $mapper_device"
