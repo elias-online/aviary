@@ -203,7 +203,7 @@
       cryptExecStartPre = (pkgs.writeShellScript "cryptpwd" ''${ builtins.readFile ../../scripts/systemd/cryptpwd.sh }'');
       cryptExecStart = (pkgs.writeShellScript "cryptattach" ''${ builtins.readFile ../../scripts/systemd/cryptattach.sh }'');
       cryptExecStartPost = (pkgs.writeShellScript "impermanence" ''${ builtins.readFile ../../scripts/systemd/impermanence.sh }'');
-      cryptStop = (pkgs.writeShellScript "cryptdetach" ''${ builtins.readFile ../../scripts/systemd/cryptdetach.sh }'');
+      cryptExecStop = (pkgs.writeShellScript "cryptdetach" ''${ builtins.readFile ../../scripts/systemd/cryptdetach.sh }'');
       diskDevice = "disk-primary-luks-${mapper}";
       mapperDevice = "disk-primary-luks-btrfs-${mapper}";
     in {
@@ -221,7 +221,7 @@
           serviceConfig = {
             ExecStartPre = "${cryptExecStartPre} ${mapperDevice}";
             ExecStart = "${cryptExecStart} ${mapperDevice} ${diskDevice}";
-            ExecStop = "${cryptStop} ${mapperDevice}";
+            ExecStop = "${cryptExecStop} ${mapperDevice}";
             ImportCredential = "cryptsetup.*";
             KeyringMode = "shared";
             OOMScoreAdjust = 500;
@@ -268,7 +268,7 @@
           serviceConfig = {
             ExecStartPre = "${cryptExecStartPre} ${mapperDevice}";
             ExecStart = "${cryptExecStart} ${mapperDevice} ${diskDevice}";
-            ExecStop = "${cryptStop} ${mapperDevice}";
+            ExecStop = "${cryptExecStop} ${mapperDevice}";
             ImportCredential = "cryptsetup.*";
             KeyringMode = "shared";
             OOMScoreAdjust = 500;
@@ -317,7 +317,7 @@
           serviceConfig = {
             ExecStartPre = "${cryptExecStartPre} ${mapperDevice}";
             ExecStart = "${cryptExecStart} ${mapperDevice} ${diskDevice}";
-            ExecStop = "${cryptStop} ${mapperDevice}";
+            ExecStop = "${cryptExecStop} ${mapperDevice}";
             ImportCredential = "cryptsetup.*";
             KeyringMode = "shared";
             OOMScoreAdjust = 500;
@@ -374,7 +374,9 @@
 
       storePaths = [
         cryptExecStartPre
+        cryptExecStart
         cryptExecStartPost
+        cryptExecStop
       ];
     };
 
