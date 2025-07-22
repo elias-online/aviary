@@ -363,7 +363,7 @@
         ${cryptsetupGeneratorService} = {
           enable = true;
           overrideStrategy = "asDropin";
-          serviceConfig.ExecStart = [ "" "" ];
+          serviceConfig.ExecStart = [ "" "true" ];
           serviceConfig.ExecStartPost = "${cryptExecStartPost} ${mapperDevice}";
           serviceConfig.ExecStop = [ "" "" ];
           unitConfig.DefaultDependencies = "no";
