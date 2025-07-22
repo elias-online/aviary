@@ -360,10 +360,12 @@
           };
         };
 
+        # Leave the original cryptsetup service for compatibility
+        # Use for impermanence instead
         ${cryptsetupGeneratorService} = {
           enable = true;
           overrideStrategy = "asDropin";
-          serviceConfig.ExecStart = [ "" "true" ];
+          serviceConfig.ExecStart = [ "" ":" ];
           serviceConfig.ExecStartPost = "${cryptExecStartPost} ${mapperDevice}";
           serviceConfig.ExecStop = [ "" "" ];
           unitConfig.DefaultDependencies = "no";
