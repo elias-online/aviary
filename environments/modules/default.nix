@@ -236,7 +236,7 @@
             SourcePath = "/etc/crypttab"; 
             After = [
               "cryptsetup-pre.target"
-              "dev-disk-by\x2dpartlabel-disk\x2dprimary\x2dluks\x2d${mapper}.device"
+              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
               "systemd-tpm2-setup-early.service"
               "systemd-udevd-kernel.socket"
               "wpa_supplicant-initrd.service"
@@ -247,7 +247,7 @@
               "umount.target"
             ];
             BindsTo = [
-              "dev-disk-by\x2dpartlabel-disk\x2dprimary\x2dluks\x2d${mapper}.device"
+              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
             ];
             Conflicts = [
               "umount.target"
@@ -283,7 +283,7 @@
             SourcePath = "/etc/crypttab"; 
             After = [
               "cryptsetup-pre.target"
-              "dev-disk-by\x2dpartlabel-disk\x2dprimary\x2dluks\x2d${mapper}.device"
+              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
               "systemd-cryptsetup-1.service"
               "systemd-tpm2-setup-early.service"
               "systemd-udevd-kernel.socket" 
@@ -295,7 +295,7 @@
               "umount.target"
             ];
             BindsTo = [
-              "dev-disk-by\x2dpartlabel-disk\x2dprimary\x2dluks\x2d${mapper}.device"
+              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
             ];
             Conflicts = [
               "umount.target"
@@ -332,7 +332,7 @@
             SourcePath = "/etc/crypttab"; 
             After = [
               "cryptsetup-pre.target"
-              "dev-disk-by\x2dpartlabel-disk\x2dprimary\x2dluks\x2d${mapper}.device"
+              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
               "systemd-cryptsetup-2.service"
               "systemd-tpm2-setup-early.service"
               "systemd-udevd-kernel.socket" 
@@ -344,13 +344,13 @@
               "umount.target"
             ];
             BindsTo = [
-              "dev-disk-by\x2dpartlabel-disk\x2dprimary\x2dluks\x2d${mapper}.device"
+              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
             ];
             Conflicts = [
               "umount.target"
             ]; 
             Requires = [
-              "systemd-cryptsetup-3.service"
+              "systemd-cryptsetup-2.service"
               "wpa_supplicant-initrd.service"
             ];
             Wants = [
