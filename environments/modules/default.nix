@@ -224,7 +224,7 @@
             
             ExecStart = [
               ""
-              ''${cryptExecStart} ${deviceMapper} ${deviceDisk} "${saltPassword}" "${saltRecovery}"''
+              "${cryptExecStart} ${deviceMapper} ${deviceDisk} \$${saltPassword} \$${saltRecovery}"
             ];
             
             ExecStartPost = [
