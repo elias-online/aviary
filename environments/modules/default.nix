@@ -231,6 +231,7 @@
               "${cryptExecStartPost} ${deviceMapper}"
             ];
 
+          };
           unitConfig.DefaultDependencies = "no";
         };
       };
