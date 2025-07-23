@@ -5,7 +5,7 @@ disk_device=$2
 salt_password=$3
 salt_recovery=$4
 
-while [ ! -e "/dev/mapper/$mapper_device" ]; then
+while [ ! -e "/dev/mapper/$mapper_device" ]; do
 
     if plymouth --ping || (exit 1); then
         password=$(systemd-ask-password --timeout=0 --no-tty "Enter passphrase for system")
