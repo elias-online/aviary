@@ -98,19 +98,7 @@
   
     secondary = "disk-secondary-luks-btrfs-" + mapper;
 
-    cryptsetupGeneratorService = "systemd-cryptsetup@disk\\x2dprimary\\x2dluks\\x2dbtrfs\\x2d" + mapper;
-  
-    passwordHash =
-      builtins.replaceStrings ["\n"] [""]
-      (builtins.readFile config.sops.secrets."${config.aviary.secrets.passwordHash}".path);
-  
-    #passwordHashSalt = builtins.head (builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" passwordHash);
-  
-    luksHash =
-      builtins.replaceStrings ["\n"] [""]
-      (builtins.readFile config.sops.secrets."${config.aviary.secrets.luksHash}".path);
-  
-    #luksHashSalt = builtins.head (builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" luksHash);
+    cryptsetupGeneratorService = "systemd-cryptsetup@disk\\x2dprimary\\x2dluks\\x2dbtrfs\\x2d" + mapper; 
 
     defaultPerms = {
       mode = "0440";
@@ -200,12 +188,26 @@
     boot.initrd.systemd = 
 
     let
-      cryptExecStartPre = (pkgs.writeShellScript "cryptpwd" ''${ builtins.readFile ../../scripts/systemd/cryptpwd.sh }'');
-      cryptExecStart = (pkgs.writeShellScript "cryptattach" ''${ builtins.readFile ../../scripts/systemd/cryptattach.sh }'');
+      cryptExecStart = (pkgs.writeShellScript "cryptsetup" ''${ builtins.readFile ../../scripts/systemd/cryptsetup.sh }'');
       cryptExecStartPost = (pkgs.writeShellScript "impermanence" ''${ builtins.readFile ../../scripts/systemd/impermanence.sh }'');
-      cryptExecStop = (pkgs.writeShellScript "cryptdetach" ''${ builtins.readFile ../../scripts/systemd/cryptdetach.sh }'');
-      diskDevice = "disk-primary-luks-${mapper}";
-      mapperDevice = "disk-primary-luks-btrfs-${mapper}";
+      deviceDisk = "disk-primary-luks-${mapper}";
+      deviceMapper = "disk-primary-luks-btrfs-${mapper}";
+
+      saltPassword = builtins.head (
+        builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" (
+          builtins.replaceStrings ["\n"] [""] (
+            builtins.readFile config.sops.secrets."${config.aviary.secrets.passwordHash}".path
+          )
+        )
+      );
+  
+      saltRecovery = builtins.head (
+        builtins.match  "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" (
+          builtins.replaceStrings ["\n"] [""] (
+            builtins.readFile config.sops.secrets."${config.aviary.secrets.luksHash}".path
+          )
+        )
+      );
     in {
 
       packages = with pkgs; [mkpasswd];
@@ -213,172 +215,29 @@
 
       services = {
 
-        systemd-ask-password-console.wantedBy = ["cryptsetup.target"];
+        systemd-ask-password-console.wantedBy = ["cryptsetup.target"]; 
 
-        "systemd-cryptsetup-1" = {
-          enable = true;
-          description = "Cryptography Setup 1 for ${mapperDevice}";
-          serviceConfig = {
-            ExecStartPre = "${cryptExecStartPre} ${mapperDevice}";
-            ExecStart = "${cryptExecStart} ${mapperDevice} ${diskDevice}";
-            ExecStop = "${cryptExecStop} ${mapperDevice}";
-            ImportCredential = "cryptsetup.*";
-            KeyringMode = "shared";
-            OOMScoreAdjust = 500;
-            RemainAfterExit = "yes";
-            TimeoutSec = "infinity";
-            Type = "oneshot";
-          };
-          unitConfig = {
-            DefaultDependencies = "no";
-            IgnoreOnIsolate = "true"; 
-            RequiresMountsFor = "/luks-key";
-            SourcePath = "/etc/crypttab"; 
-            After = [
-              "cryptsetup-pre.target"
-              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
-              "systemd-tpm2-setup-early.service"
-              "systemd-udevd-kernel.socket"
-              "wpa_supplicant-initrd.service"
-            ];
-            Before = [
-              "cryptsetup.target"
-              "blockdev@dev-mapper-${mapperDevice}.target"
-              "umount.target"
-            ];
-            BindsTo = [
-              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
-            ];
-            Conflicts = [
-              "umount.target"
-            ]; 
-            Requires = [
-              "wpa_supplicant-initrd.service"
-            ];
-            Wants = [
-              "blockdev@dev-mapper-${mapperDevice}.target"
-              "network-online.target"
-            ]; 
-          }; 
-        };
-
-        "systemd-cryptsetup-2" = {
-          enable = true;
-          description = "Cryptography Setup 2 for ${mapperDevice}";
-          serviceConfig = {
-            ExecStartPre = "${cryptExecStartPre} ${mapperDevice}";
-            ExecStart = "${cryptExecStart} ${mapperDevice} ${diskDevice}";
-            ExecStop = "${cryptExecStop} ${mapperDevice}";
-            ImportCredential = "cryptsetup.*";
-            KeyringMode = "shared";
-            OOMScoreAdjust = 500;
-            RemainAfterExit = "yes";
-            TimeoutSec = "infinity";
-            Type = "oneshot";
-          };
-          unitConfig = {
-            DefaultDependencies = "no";
-            IgnoreOnIsolate = "true"; 
-            RequiresMountsFor = "/luks-key";
-            SourcePath = "/etc/crypttab"; 
-            After = [
-              "cryptsetup-pre.target"
-              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
-              "systemd-cryptsetup-1.service"
-              "systemd-tpm2-setup-early.service"
-              "systemd-udevd-kernel.socket" 
-              "wpa_supplicant-initrd.service"
-            ];
-            Before = [
-              "cryptsetup.target"
-              "blockdev@dev-mapper-${mapperDevice}.target"
-              "umount.target"
-            ];
-            BindsTo = [
-              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
-            ];
-            Conflicts = [
-              "umount.target"
-            ]; 
-            Requires = [
-              "systemd-cryptsetup-1.service"
-              "wpa_supplicant-initrd.service"
-            ];
-            Wants = [
-              "blockdev@dev-mapper-${mapperDevice}.target"
-              "network-online.target"
-            ]; 
-          };
-        };
-
-        "systemd-cryptsetup-3" = {
-          enable = true;
-          description = "Cryptography Setup 3 for ${mapperDevice}";
-          serviceConfig = {
-            ExecStartPre = "${cryptExecStartPre} ${mapperDevice}";
-            ExecStart = "${cryptExecStart} ${mapperDevice} ${diskDevice}";
-            ExecStop = "${cryptExecStop} ${mapperDevice}";
-            ImportCredential = "cryptsetup.*";
-            KeyringMode = "shared";
-            OOMScoreAdjust = 500;
-            RemainAfterExit = "yes";
-            TimeoutSec = "infinity";
-            Type = "oneshot";
-          };
-          unitConfig = {
-            DefaultDependencies = "no";
-            IgnoreOnIsolate = "true"; 
-            RequiresMountsFor = "/luks-key";
-            SourcePath = "/etc/crypttab"; 
-            After = [
-              "cryptsetup-pre.target"
-              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
-              "systemd-cryptsetup-2.service"
-              "systemd-tpm2-setup-early.service"
-              "systemd-udevd-kernel.socket" 
-              "wpa_supplicant-initrd.service"
-            ];
-            Before = [
-              "cryptsetup.target"
-              "blockdev@dev-mapper-${mapperDevice}.target"
-              "umount.target"
-            ];
-            BindsTo = [
-              "dev-disk-by\\x2dpartlabel-disk\\x2dprimary\\x2dluks\\x2d${mapper}.device"
-            ];
-            Conflicts = [
-              "umount.target"
-            ]; 
-            Requires = [
-              "systemd-cryptsetup-2.service"
-              "wpa_supplicant-initrd.service"
-            ];
-            Wants = [
-              "blockdev@dev-mapper-${mapperDevice}.target"
-              "network-online.target"
-            ]; 
-          };
-        };
-
-        # Leave the original cryptsetup service for compatibility
-        # Use for impermanence instead
         ${cryptsetupGeneratorService} = {
           enable = true;
           overrideStrategy = "asDropin";
-          serviceConfig.ExecStart = [ "" ":" ];
-          serviceConfig.ExecStartPost = "${cryptExecStartPost} ${mapperDevice}";
-          serviceConfig.ExecStop = [ "" "" ];
+          serviceConfig = {
+            
+            ExecStart = [
+              ""
+              "${cryptExecStart} ${deviceMapper} ${deviceDisk} ${saltPassword} ${saltRecovery}"
+            ];
+            
+            ExecStartPost = [
+              "${cryptExecStartPost} ${deviceMapper}"
+            ];
+
           unitConfig.DefaultDependencies = "no";
-          unitConfig.After = [ "systemd-cryptsetup-3.service" ];
-          unitConfig.Requires = [ "systemd-cryptsetup-3.service" ];
         };
       };
 
       storePaths = [
-        cryptExecStartPre
         cryptExecStart
         cryptExecStartPost
-        cryptExecStop
       ];
     };
 
