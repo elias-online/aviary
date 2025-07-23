@@ -2,8 +2,8 @@
 
 mapper_device=$1
 disk_device=$2
-salt_password="$3"
-salt_recovery="$4"
+salt_password=$3
+salt_recovery=$4
 
 while [ ! -e "/dev/mapper/$mapper_device" ]; do
 
