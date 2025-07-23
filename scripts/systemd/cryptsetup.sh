@@ -2,8 +2,8 @@
 
 mapper_device=$1
 disk_device=$2
-salt_password=$3
-salt_recovery=$4
+salt_password="$3"
+salt_recovery="$4"
 
 while [ ! -e "/dev/mapper/$mapper_device" ]; do
 
@@ -13,7 +13,7 @@ while [ ! -e "/dev/mapper/$mapper_device" ]; do
         password=$(systemd-ask-password --timeout=0 --no-tty "Enter passphrase for system:")
     fi
 
-    hash_password=$(mkpasswd --method=yescrypt --salt="$salt_password" "$password")
+    hash_password=$(mkpasswd --method=yescrypt --salt=${salt_password} "$password")
     hash_recovery=$(mkpasswd --method=yescrypt --salt="$salt_recovery" "$password")
 
     umask 0377
