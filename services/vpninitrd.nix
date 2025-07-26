@@ -74,6 +74,7 @@ in {
             "PORT=${builtins.toString config.services.tailscale.port}"
             ''"FLAGS=--tun ${config.services.tailscale.interfaceName}"''
           ];
+          serviceConfig.TimeoutSec = "infinity";
           preStart = "cat /run/secretsInitrd/ts-initrd";
           postStart = ''
             authKey="$(cat /run/secretsInitrd/ts-initrd)"
