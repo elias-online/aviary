@@ -250,6 +250,8 @@
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
 
+      mounts."sysroot-nix".mountConfig.TimeoutSec = "infinity";
+
       services = {
 
         systemd-ask-password-console.wantedBy = ["cryptsetup.target"]; 
