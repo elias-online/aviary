@@ -250,7 +250,10 @@
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
 
-      mounts."sysroot-nix".mountConfig.TimeoutSec = "infinity";
+      mounts = [{
+        where = "/sysroot/nix";
+        mountConfig.TimeoutSec = "infinity";
+      }];
 
       services = {
 
