@@ -250,10 +250,15 @@
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
 
-      mounts = [{
-        where = "/sysroot/nix";
-        mountConfig.TimeoutSec = "infinity";
-      }];
+      mounts = lib.map (mnt:
+        if mnt.where == "/sysroot/nix" then
+          mnt // {
+            mountConfig = mnt.mountConfig // {
+              TimeoutSec = "infinity";
+            };
+          }
+        else mnt
+      ) config.boot.initrd.systemd.mounts;
 
       services = {
 
