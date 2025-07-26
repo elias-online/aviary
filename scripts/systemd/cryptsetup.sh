@@ -1,6 +1,6 @@
 #!/bin/sh
 
-systemd_package=$1
+systemd_path=$1
 mapper_device=$2
 disk_path=$3
 flags=$4
@@ -29,6 +29,6 @@ while [ ! -e "/dev/mapper/$mapper_device" ]; do
     umask 0022
 
     #systemd-cryptsetup attach "$mapper_device" "/dev/disk/by-partlabel/$disk_device" /luks-key discard,headless || echo "/luks-key is incorrect, could not attach $mapper_device"
-    $systemd_package/bin/systemd-cryptsetup attach "$mapper_device" "$disk_path" "-" "$flags"
+    $systemd_path/bin/systemd-cryptsetup attach "$mapper_device" "$disk_path" "-" "$flags"
 
 done
