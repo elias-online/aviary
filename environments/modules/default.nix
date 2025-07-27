@@ -249,6 +249,11 @@
 
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
+
+      targets.cryptsetup.wantedBy = [
+        "dev-mapper-${utils.escapeSystemdPath primary}.device"
+        "dev-mapper-${utils.escapeSystemdPath secondary}.device"
+      ];
  
       services = {
 
@@ -298,8 +303,7 @@
                 KeyringMode = "shared";
                 OOMScoreAdjust = 500;
                 ImportCredential = "cryptsetup.*";
-                ExecStartPre = "${cryptExecStart} ${cfg.package} ${attrs.name} ${attrs.value.device} ${flags} \$${saltPassword} \$${saltRecovery}";
-                ExecStart = "echo 'Done!'";
+                ExecStart = "${cryptExecStart} ${cfg.package} ${attrs.name} ${attrs.value.device} ${flags} \$${saltPassword} \$${saltRecovery}";
                 ExecStartPost =
                   if "${attrs.name}" == "${deviceMapper}"
                   then "${cryptExecStartPost} ${attrs.name}"
