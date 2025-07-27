@@ -249,6 +249,24 @@
 
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
+
+      tmpfiles.settings =
+
+      let
+        file = {
+          group = "root";
+          mode = "0400";
+          user = "root";
+          argument = ''
+            [Unit]
+            JobTimeoutSec=infinity
+          '';
+        };
+      in {
+
+        "overrides.conf"."/run/systemd/generator/dev-mapper-${utils.escapeSystemdPath primary}.service.d".f = file;
+        "overrides.conf"."/run/systemd/generator/dev-mapper-${utils.escapeSystemdPath secondary}.service.d".f = file;
+      };
  
       services = {
 
@@ -283,7 +301,7 @@
             flags = lib.concatStringsSep "," extraOpts;
           in
           [
-            (lib.nameValuePair "systemd-cryptsetup@${utils.escapeSystemdPath attrs.name}" {
+            (lib.nameValuePair "cryptsetup-${attrs.name}" {
               unitConfig = {
                 Description = "Cryptography setup for ${attrs.name}";
                 DefaultDependencies = "no";
