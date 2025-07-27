@@ -299,7 +299,7 @@
                 OOMScoreAdjust = 500;
                 ImportCredential = "cryptsetup.*";
                 ExecStartPre = "${cryptExecStart} ${cfg.package} ${attrs.name} ${attrs.value.device} ${flags} \$${saltPassword} \$${saltRecovery}";
-                ExecStart = ":";
+                ExecStart = "echo 'Done!'";
                 ExecStartPost =
                   if "${attrs.name}" == "${deviceMapper}"
                   then "${cryptExecStartPost} ${attrs.name}"
