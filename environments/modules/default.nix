@@ -270,7 +270,17 @@
  
       services = {
 
-        systemd-ask-password-console.wantedBy = ["cryptsetup.target"]; 
+        systemd-tmpfiles-setup.wantedBy = [
+          "systemd-udev-trigger.service"
+          "systemd-udevd.service"
+        ];
+
+        systemd-tmpfiles-setup-sysroot.wantedBy = [
+          "systemd-udev-trigger.service"
+          "systemd-udevd.service"
+        ];
+
+        systemd-ask-password-console.wantedBy = [ "cryptsetup.target" ]; 
 
         check-pcrs = lib.mkIf (config.aviary.pcr15 != null) {
           script = ''
