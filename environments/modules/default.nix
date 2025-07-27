@@ -319,13 +319,15 @@
                 #"local-fs-pre.target"
                 "cryptsetup.target"
                 "umount.target"
-                "create-needed-for-boot-dirs.service"
+                #"create-needed-for-boot-dirs.service"
+                "dev-mapper-${attrs.name}.device"
               ];
               wants = [ "blockdev@dev-mapper-${attrs.name}.target" ];
               wantedBy = [
                 #"initrd-root-device.target"
                 #"local-fs-pre.target"
-                "create-needed-for-boot-dirs.service"
+                #"create-needed-for-boot-dirs.service"
+                "dev-mapper-${attrs.name}.device"
               ];
               requiredBy = [ "sysroot.mount" ];
               requires = [ "wpa_supplicant-initrd.service" ];
