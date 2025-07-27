@@ -220,7 +220,7 @@
 
     #security.tpm2.enable = true;
 
-    boot.kernelParams = [ "rd.luks=no" ];
+    #boot.kernelParams = [ "rd.luks=no" ];
 
     boot.initrd.systemd = 
 
@@ -250,35 +250,7 @@
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
 
-      tmpfiles.settings =
-
-      let
-        file = {
-          group = "root";
-          mode = "0400";
-          user = "root";
-          argument = ''
-            [Unit]
-            JobTimeoutSec=infinity
-          '';
-        };
-      in {
-
-        "10-primary"."/etc/systemd/system/dev-mapper-disk\\\\x2dprimary\\\\x2dluks\\\\x2dbtrfs\\\\x2d${mapper}.device.d/overrides.conf".f = file;
-        "20-secondary"."/etc/systemd/system/dev-mapper-disk\\\\x2dsecondary\\\\x2dluks\\\\x2dbtrfs\\\\x2d${mapper}.device.d/overrides.conf".f = file;
-      };
- 
-      services = {
-
-        systemd-tmpfiles-setup.wantedBy = [
-          "systemd-udev-trigger.service"
-          "systemd-udevd.service"
-        ];
-
-        systemd-tmpfiles-setup-sysroot.wantedBy = [
-          "systemd-udev-trigger.service"
-          "systemd-udevd.service"
-        ];
+        services = {
 
         systemd-ask-password-console.wantedBy = [ "cryptsetup.target" ]; 
 
@@ -311,7 +283,21 @@
             flags = lib.concatStringsSep "," extraOpts;
           in
           [
-            (lib.nameValuePair "cryptsetup-${attrs.name}" {
+            (lib.nameValuePair "systemd-cryptsetup@${utils.escapeSystemdPath attrs.name}" {
+              enable = true;
+              overrideStrategy = "asDropin";
+              serviceConfig = {
+                ExecStart = [
+                  ""
+                  "${cryptExecStart} ${cfg.package} ${attrs.name} ${attrs.value.device} ${flags} \$${saltPassword} \$${saltRecovery}"
+                ];
+                ExecStartPost =
+                  if "${attrs.name}" == "${deviceMapper}"
+                  then "${cryptExecStartPost} ${attrs.name}"
+                  else "";
+              };
+              unitConfig.DefaultDependencies = "no";
+              /*
               unitConfig = {
                 Description = "Cryptography setup for ${attrs.name}";
                 DefaultDependencies = "no";
@@ -362,6 +348,7 @@
                 #"dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
               ];
               requires = [ "wpa_supplicant-initrd.service" ];
+              */
             })
           ]
           ++ acc
