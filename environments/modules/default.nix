@@ -264,8 +264,8 @@
         };
       in {
 
-        "overrides.conf"."/run/systemd/generator/dev-mapper-disk\\\\x2dprimary\\\\x2dluks\\\\x2dbtrfs\\\\x2d${mapper}.service.d".f = file;
-        "overrides.conf"."/run/systemd/generator/dev-mapper-disk\\\\x2dsecondary\\\\x2dluks\\\\x2dbtrfs\\\\x2d${mapper}.service.d".f = file;
+        "overrides.conf"."/run/systemd/generator/dev-mapper-disk\\\\x2dprimary\\\\x2dluks\\\\x2dbtrfs\\\\x2d${mapper}.device.d".f = file;
+        "overrides.conf"."/run/systemd/generator/dev-mapper-disk\\\\x2dsecondary\\\\x2dluks\\\\x2dbtrfs\\\\x2d${mapper}.device.d".f = file;
       };
  
       services = {
