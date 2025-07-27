@@ -319,9 +319,9 @@
                 "umount.target"
               ];
               wants = [ "blockdev@dev-mapper-${attrs.name}.target" ];
+              wantedBy = [ "cryptsetup.target" ];
               requiredBy = [
                 "sysroot.mount"
-                "dev-mapper-${attrs.name}.device"
               ];
               requires = [ "wpa_supplicant-initrd.service" ];
             })
