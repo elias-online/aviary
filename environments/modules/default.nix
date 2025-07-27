@@ -320,7 +320,7 @@
                 "cryptsetup.target"
                 "umount.target"
                 #"create-needed-for-boot-dirs.service"
-                #"dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
+                "dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
               ];
               wants = [ "blockdev@dev-mapper-${attrs.name}.target" ];
               wantedBy = [
