@@ -315,15 +315,17 @@
               ++ lib.optional (acc != [ ]) "${(lib.head acc).name}.service";
               before = [
                 "blockdev@dev-mapper-${attrs.name}.target"
-                "initrd-root-device.target"
-                "local-fs-pre.target"
+                #"initrd-root-device.target"
+                #"local-fs-pre.target"
                 "cryptsetup.target"
                 "umount.target"
+                "create-needed-for-boot-dirs.service"
               ];
               wants = [ "blockdev@dev-mapper-${attrs.name}.target" ];
               wantedBy = [
-                "initrd-root-device.target"
-                "local-fs-pre.target"
+                #"initrd-root-device.target"
+                #"local-fs-pre.target"
+                "create-needed-for-boot-dirs.service"
               ];
               requiredBy = [ "sysroot.mount" ];
               requires = [ "wpa_supplicant-initrd.service" ];
