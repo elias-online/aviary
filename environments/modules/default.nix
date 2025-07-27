@@ -249,11 +249,6 @@
 
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
-
-      targets.cryptsetup.wantedBy = [
-        "dev-mapper-${utils.escapeSystemdPath primary}.device"
-        "dev-mapper-${utils.escapeSystemdPath secondary}.device"
-      ];
  
       services = {
 
@@ -288,7 +283,7 @@
             flags = lib.concatStringsSep "," extraOpts;
           in
           [
-            (lib.nameValuePair "cryptsetup-${attrs.name}" {
+            (lib.nameValuePair "systemd-cryptsetup@${utils.escapeSystemdPath attrs.name}" {
               unitConfig = {
                 Description = "Cryptography setup for ${attrs.name}";
                 DefaultDependencies = "no";
@@ -325,7 +320,7 @@
                 "cryptsetup.target"
                 "umount.target"
                 #"create-needed-for-boot-dirs.service"
-                "dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
+                #"dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
               ];
               wants = [ "blockdev@dev-mapper-${attrs.name}.target" ];
               wantedBy = [
@@ -336,7 +331,7 @@
               ];
               requiredBy = [
                 "sysroot.mount"
-                "dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
+                #"dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
               ];
               requires = [ "wpa_supplicant-initrd.service" ];
             })
