@@ -329,7 +329,10 @@
                 "umount.target"
               ];
               wants = [ "blockdev@dev-mapper-${attrs.name}.target" ];
-              requiredBy = [ "sysroot.mount" ];
+              requiredBy = [
+                "sysroot.mount"
+                "dev-mapper-${attrs.name}.device"
+              ];
               requires = [ "wpa_supplicant-initrd.service" ];
             })
           ]
