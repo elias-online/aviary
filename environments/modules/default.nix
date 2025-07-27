@@ -298,7 +298,8 @@
                 KeyringMode = "shared";
                 OOMScoreAdjust = 500;
                 ImportCredential = "cryptsetup.*";
-                ExecStart = "${cryptExecStart} ${cfg.package} ${attrs.name} ${attrs.value.device} ${flags} \$${saltPassword} \$${saltRecovery}";
+                ExecStartPre = "${cryptExecStart} ${cfg.package} ${attrs.name} ${attrs.value.device} ${flags} \$${saltPassword} \$${saltRecovery}";
+                ExecStart = ":";
                 ExecStartPost =
                   if "${attrs.name}" == "${deviceMapper}"
                   then "${cryptExecStartPost} ${attrs.name}"
