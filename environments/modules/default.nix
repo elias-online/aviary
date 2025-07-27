@@ -315,11 +315,12 @@
               ++ lib.optional (acc != [ ]) "${(lib.head acc).name}.service";
               before = [
                 "blockdev@dev-mapper-${attrs.name}.target"
+                "initrd-root-device.target"
                 "cryptsetup.target"
-                "initrd-boot-device.target"
                 "umount.target"
               ];
               wants = [ "blockdev@dev-mapper-${attrs.name}.target" ];
+              wantedBy = [ "initrd-root-device.target" ];
               requiredBy = [ "sysroot.mount" ];
               requires = [ "wpa_supplicant-initrd.service" ];
             })
