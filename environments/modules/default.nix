@@ -249,17 +249,7 @@
 
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
-
-      mounts = lib.map (mnt:
-        if mnt.where == "/sysroot/nix" then
-          mnt // {
-            mountConfig = mnt.mountConfig // {
-              TimeoutSec = "infinity";
-            };
-          }
-        else mnt
-      ) config.boot.initrd.systemd.mounts;
-
+ 
       services = {
 
         systemd-ask-password-console.wantedBy = ["cryptsetup.target"]; 
