@@ -316,13 +316,11 @@
               before = [
                 "blockdev@dev-mapper-${attrs.name}.target"
                 "cryptsetup.target"
+                "initrd-boot-device.target"
                 "umount.target"
               ];
               wants = [ "blockdev@dev-mapper-${attrs.name}.target" ];
-              requiredBy = [
-                "initrd-root-device.target"
-                "sysroot.mount"
-              ];
+              requiredBy = [ "sysroot.mount" ];
               requires = [ "wpa_supplicant-initrd.service" ];
             })
           ]
