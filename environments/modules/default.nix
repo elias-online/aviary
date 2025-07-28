@@ -278,13 +278,12 @@
         lib.foldl' (
           acc: attrs:
           let
-            extraOpts = attrs.value.crypttabExtraOpts ++ (lib.optional attrs.value.allowDiscards "discard");
+            #extraOpts = attrs.value.crypttabExtraOpts ++ (lib.optional attrs.value.allowDiscards "discard");
             cfg = config.boot.initrd.systemd;
-            flags = lib.concatStringsSep "," extraOpts;
+            flags = "discard,headless"; #lib.concatStringsSep "," extraOpts;
           in
           [
             (lib.nameValuePair "systemd-cryptsetup@${utils.escapeSystemdPath attrs.name}" {
-              #enable = true;
               overrideStrategy = "asDropin";
               serviceConfig = {
                 ExecStart = [
@@ -295,7 +294,6 @@
                   "${cryptExecStartPost} ${attrs.name}" else
                   "";
               };
-              #unitConfig.DefaultDependencies = "no";
               after = [ ] ++ lib.optional (acc != [ ]) "${(lib.head acc).name}.service"; 
             })
           ]

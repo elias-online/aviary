@@ -7,6 +7,8 @@ flags=$4
 salt_password=$5
 salt_recovery=$6
 
+$systemd_path/bin/systemd-cryptsetup attach "$mapper_device" "$disk_path" "-" "$flags"
+
 while [ ! -e "/dev/mapper/$mapper_device" ]; do
 
     if plymouth --ping || (exit 1); then
@@ -29,6 +31,10 @@ while [ ! -e "/dev/mapper/$mapper_device" ]; do
     umask 0022
 
     #systemd-cryptsetup attach "$mapper_device" "/dev/disk/by-partlabel/$disk_device" /luks-key discard,headless || echo "/luks-key is incorrect, could not attach $mapper_device"
-    $systemd_path/bin/systemd-cryptsetup attach "$mapper_device" "$disk_path" "-" "$flags"
+    $systemd_path/bin/systemd-cryptsetup attach "$mapper_device" "$disk_path" "/luks-key" "$flags"
+
+    if [ ! -e "/dev/mapper/$mapper_device" ]; then
+        $systemd_path/bin/systemd-cryptsetup attach "$mapper_device" "$disk_path" "/luks-key-recovery" "$flags"
+    fi
 
 done
