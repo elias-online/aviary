@@ -7,8 +7,6 @@ flags=$4
 salt_password=$5
 salt_recovery=$6
 
-sleep 300
-
 while [ ! -e "/dev/mapper/$mapper_device" ]; do
 
     if plymouth --ping || (exit 1); then
