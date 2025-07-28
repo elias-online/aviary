@@ -284,71 +284,19 @@
           in
           [
             (lib.nameValuePair "systemd-cryptsetup@${utils.escapeSystemdPath attrs.name}" {
-              enable = true;
+              #enable = true;
               overrideStrategy = "asDropin";
               serviceConfig = {
                 ExecStart = [
                   ""
                   "${cryptExecStart} ${cfg.package} ${attrs.name} ${attrs.value.device} ${flags} \$${saltPassword} \$${saltRecovery}"
                 ];
-                ExecStartPost =
-                  if "${attrs.name}" == "${deviceMapper}"
-                  then "${cryptExecStartPost} ${attrs.name}"
-                  else "";
+                ExecStartPost = if "${attrs.name}" == "${deviceMapper}" then
+                  "${cryptExecStartPost} ${attrs.name}" else
+                  "";
               };
-              unitConfig.DefaultDependencies = "no";
-              /*
-              unitConfig = {
-                Description = "Cryptography setup for ${attrs.name}";
-                DefaultDependencies = "no";
-                IgnoreOnIsolate = true;
-                Conflicts = [ "umount.target" ];
-                BindsTo = "${utils.escapeSystemdPath attrs.value.device}.device";
-              };
-              serviceConfig = {
-                Type = "oneshot";
-                RemainAfterExit = true;
-                TimeoutSec = "infinity";
-                KeyringMode = "shared";
-                OOMScoreAdjust = 500;
-                ImportCredential = "cryptsetup.*";
-                ExecStart = "${cryptExecStart} ${cfg.package} ${attrs.name} ${attrs.value.device} ${flags} \$${saltPassword} \$${saltRecovery}";
-                ExecStartPost =
-                  if "${attrs.name}" == "${deviceMapper}"
-                  then "${cryptExecStartPost} ${attrs.name}"
-                  else "";
-                ExecStop = ''${cfg.package}/bin/systemd-cryptsetup detach '${attrs.name}' '';
-              };
-              after = [
-                "cryptsetup-pre.target"
-                "systemd-udevd-kernel.socket"
-                "wpa_supplicant-initrd.service"
-                "${utils.escapeSystemdPath attrs.value.device}.device"
-              ]
-              ++ (lib.optional cfg.tpm2.enable "systemd-tpm2-setup-early.service")
-              ++ lib.optional (acc != [ ]) "${(lib.head acc).name}.service";
-              before = [
-                "blockdev@dev-mapper-${attrs.name}.target"
-                #"initrd-root-device.target"
-                #"local-fs-pre.target"
-                "cryptsetup.target"
-                "umount.target"
-                #"create-needed-for-boot-dirs.service"
-                #"dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
-              ];
-              wants = [ "blockdev@dev-mapper-${attrs.name}.target" ];
-              wantedBy = [
-                #"initrd-root-device.target"
-                #"local-fs-pre.target"
-                #"create-needed-for-boot-dirs.service"
-                #"dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
-              ];
-              requiredBy = [
-                "sysroot.mount"
-                #"dev-mapper-${utils.escapeSystemdPath attrs.name}.device"
-              ];
-              requires = [ "wpa_supplicant-initrd.service" ];
-              */
+              #unitConfig.DefaultDependencies = "no";
+              after = [ ] ++ lib.optional (acc != [ ]) "${(lib.head acc).name}.service"; 
             })
           ]
           ++ acc
