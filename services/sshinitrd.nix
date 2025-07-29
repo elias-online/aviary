@@ -91,8 +91,8 @@
               wants = [ "network.target" ];
               wantedBy = [ "multi-user.target" ];
               serviceConfig = {
-                ExecStartPre = "${wpaExecStartPre}";
-                ExecStart = "${wpaExecStart}";
+                ExecStartPre = "${wpaExecStartPre} 'disk-primary-luks-btrfs-${mapper}'";
+                ExecStart = "${wpaExecStart} 'disk-primary-luks-btrfs-${mapper}'";
                 TimeoutStartSec = 0;
                 Type = "simple";
               };  

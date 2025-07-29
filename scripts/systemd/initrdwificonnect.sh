@@ -1,12 +1,14 @@
 #!/bin/sh
 
-if [ -e "/run/systemd/tpm2-srk-public-key.pem" ]; then
-    echo "TPM present, stopping script"
+mapper_device=$1
+
+if [ -e "/dev/mapper/$mapper_device" ]; then
+    echo "Mapper device already unlocked with TPM, exiting..."
     exit 0
 fi
 
 if [ ! -e "/sys/class/net/wifi0" ]; then
-    echo "No wifi device present, stopping script"
+    echo "No wifi device present, stopping script..."
     exit 0
 fi
 

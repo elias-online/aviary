@@ -288,7 +288,7 @@
             ImportCredential = "cryptsetup.*"; 
           };
           script = ''
-              (systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,tpm2-device=auto,tpm2-measure-pcr=yes') || (exit 0)
+              (systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,tpm2-device=auto,tpm2-measure-pcr=yes,headless') || (exit 0)
             '';
           after = [
             "cryptsetup-pre.target"
