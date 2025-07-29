@@ -285,11 +285,11 @@
             TimeoutSec = "infinity";
             KeyringMode = "shared";
             OOMScoreAdjust = 500;
-            ImportCredential = "cryptsetup.*";
-            ExecStart = ''
-              systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,tpm2-device=auto,tpm2-measure-pcr=yes' || (exit 0)
-            '';
+            ImportCredential = "cryptsetup.*"; 
           };
+          script = ''
+              (systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,tpm2-device=auto,tpm2-measure-pcr=yes') || (exit 0)
+            '';
           after = [
             "cryptsetup-pre.target"
             "systemd-udevd-kernel.socket"
