@@ -286,7 +286,7 @@
             KeyringMode = "shared";
             OOMScoreAdjust = 500;
             ImportCredential = "cryptsetup.*";
-            ExecStart = "systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,tpm2-device=auto,tpm2-measure-pcr=yes'";
+            ExecStart = "systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,tpm2-device=auto,tpm2-measure-pcr=yes' || (exit 0)";
           };
           after = [
             "cryptsetup-pre.target"
@@ -301,7 +301,7 @@
             "wpa_supplicant-initrd.service"
           ];
           wants = [ "blockdev@dev-mapper-${deviceMapper}.target" ];
-          requiredBy = [ "sysroot.mount" ];
+          requiredBy = [ "sysroot.mount" "wpa_supplicant-initrd.service" ];
         };
       }
       // (lib.listToAttrs (
