@@ -46,6 +46,7 @@
           config.crypttabExtraOpts = [
             "tpm2-device=auto"
             "tpm2-measure-pcr=yes"
+            "headless"
           ];
         });
     };
@@ -218,10 +219,6 @@
       ];
     };
 
-    #security.tpm2.enable = true;
-
-    #boot.kernelParams = [ "rd.luks=no" ];
-
     boot.initrd.systemd = 
 
     let
@@ -250,7 +247,7 @@
       packages = with pkgs; [mkpasswd];
       initrdBin = with pkgs; [mkpasswd];
 
-        services = {
+      services = {
 
         systemd-ask-password-console.wantedBy = [ "cryptsetup.target" ]; 
 
@@ -273,14 +270,47 @@
           before = [ "sysroot.mount" ];
           requiredBy = [ "sysroot.mount" ];
         };
+
+        "systemd-cryptsetup-early" = {
+          unitConfig = {
+            Description = "Early cryptography setup for ${deviceMapper}";
+            DefaultDependencies = "no";
+            IgnoreOnIsolate = true;
+            Conflicts = [ "umount.target" ];
+            BindsTo = [ "dev-disk-${utils.escapeSystemdPath "by-partlabel"}-${utils.escapeSystemdPath deviceDisk}.device" ];
+          };
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            TimeoutSec = "infinity";
+            KeyringMode = "shared";
+            OOMScoreAdjust = 500;
+            ImportCredential = "cryptsetup.*";
+            ExecStart = "systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,tpm2-device=auto,tpm2-measure-pcr=yes'";
+          };
+          after = [
+            "cryptsetup-pre.target"
+            "systemd-udevd-kernel.socket"
+            "dev-disk-${utils.escapeSystemdPath "by-partlabel"}-${utils.escapeSystemdPath deviceDisk}.device"
+          ]
+          ++ (lib.optional config.boot.initrd.systemd.tpm2.enable "systemd-tpm2-setup-early.service");
+          before = [
+            "blockdev@dev-mapper-${deviceMapper}.target"
+            "cryptsetup.target"
+            "umount.target"
+            "wpa_supplicant-initrd.service"
+          ];
+          wants = [ "blockdev@dev-mapper-${deviceMapper}.target" ];
+          requiredBy = [ "sysroot.mount" ];
+        };
       }
       // (lib.listToAttrs (
         lib.foldl' (
           acc: attrs:
           let
-            #extraOpts = attrs.value.crypttabExtraOpts ++ (lib.optional attrs.value.allowDiscards "discard");
+            extraOpts = attrs.value.crypttabExtraOpts ++ (lib.optional attrs.value.allowDiscards "discard");
             cfg = config.boot.initrd.systemd;
-            flags = "discard,headless"; #lib.concatStringsSep "," extraOpts;
+            flags = lib.concatStringsSep "," extraOpts;
           in
           [
             (lib.nameValuePair "systemd-cryptsetup@${utils.escapeSystemdPath attrs.name}" {

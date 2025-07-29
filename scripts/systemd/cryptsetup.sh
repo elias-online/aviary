@@ -7,8 +7,6 @@ flags=$4
 salt_password=$5
 salt_recovery=$6
 
-$systemd_path/bin/systemd-cryptsetup attach "$mapper_device" "$disk_path" "-" "$flags"
-
 while [ ! -e "/dev/mapper/$mapper_device" ]; do
 
     if plymouth --ping || (exit 1); then
