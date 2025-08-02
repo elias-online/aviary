@@ -32,12 +32,8 @@ Aviary is an opinionated NixOS flake configuration designed to facility easy sys
  - Optional Gnome Desktop
 
 # TODO
- - Initrd interactive wifi connection for Recovery
  - Initrd VPN connection no experation option
- - SHA512 hashed password to prevent storing SOPS password secret in plain-text
  - Log out of tailscale before shutdown if ephemeral ts key
- - Test hardware.enableAllFirmware = true in environment/modules/default.nix
- - Test Hyprland
 
 # SETUP
 

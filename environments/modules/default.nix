@@ -39,18 +39,6 @@
       example = "6214de8c3d861c4b451acc8c4e24294c95d55bcec516bbf15c077ca3bffb6547";
     };
 
-    boot.initrd.luks.devices = lib.mkOption {
-      type =
-        with lib.types;
-        attrsOf (submodule {
-          config.crypttabExtraOpts = [
-            "tpm2-device=auto"
-            "tpm2-measure-pcr=yes"
-            "headless"
-          ];
-        });
-    };
-
     secrets = {
 
       description = lib.mkOption {
@@ -132,9 +120,7 @@
 
     primary = "disk-primary-luks-btrfs-" + mapper;
   
-    secondary = "disk-secondary-luks-btrfs-" + mapper;
-
-    cryptsetupGeneratorService = "systemd-cryptsetup@disk\\x2dprimary\\x2dluks\\x2dbtrfs\\x2d" + mapper; 
+    secondary = "disk-secondary-luks-btrfs-" + mapper; 
 
     defaultPerms = {
       mode = "0440";
@@ -224,6 +210,8 @@
     let
       cryptExecStart = (pkgs.writeShellScript "cryptsetup" ''${ builtins.readFile ../../scripts/systemd/cryptsetup.sh }'');
       cryptExecStartPost = (pkgs.writeShellScript "impermanence" ''${ builtins.readFile ../../scripts/systemd/impermanence.sh }'');
+      pcrExecStart = (pkgs.writeShellScript "pcr15check" ''${ builtins.readFile ../../scripts/systemd/pcr15check.sh }'');
+
       deviceDisk = "disk-primary-luks-${mapper}";
       deviceMapper = "disk-primary-luks-btrfs-${mapper}";
 
@@ -251,19 +239,11 @@
 
         systemd-ask-password-console.wantedBy = [ "cryptsetup.target" ]; 
 
-        check-pcrs = lib.mkIf (config.aviary.pcr15 != null) {
-          script = ''
-            echo "Checking PCR 15 value"
-            if [[ $(systemd-analyze pcrs 15 --json=short | jq -r ".[0].sha256") != "${config.aviary.pcr15}" ]] ; then
-              echo "PCR 15 check failed"
-              exit 1
-            else
-              echo "PCR 15 check suceed"
-            fi
-          '';
+        "check-pcrs" = lib.mkIf (config.aviary.pcr15 != null) { 
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
+            ExecStart = "${pcrExecStart} '${config.aviary.pcr15}'";
           };
           unitConfig.DefaultDependencies = "no";
           after = [ "cryptsetup.target" ];
@@ -288,7 +268,7 @@
             ImportCredential = "cryptsetup.*"; 
           };
           script = ''
-              (systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,tpm2-device=auto,tpm2-measure-pcr=yes,headless') || (exit 0)
+              (systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,headless,tpm2-device=auto,tpm2-measure-pcr=yes') || (exit 0)
             '';
           after = [
             "cryptsetup-pre.target"
@@ -310,9 +290,8 @@
         lib.foldl' (
           acc: attrs:
           let
-            extraOpts = attrs.value.crypttabExtraOpts ++ (lib.optional attrs.value.allowDiscards "discard");
             cfg = config.boot.initrd.systemd;
-            flags = lib.concatStringsSep "," extraOpts;
+            flags = "discard,headless";
           in
           [
             (lib.nameValuePair "systemd-cryptsetup@${utils.escapeSystemdPath attrs.name}" {
@@ -336,6 +315,7 @@
       storePaths = [
         cryptExecStart
         cryptExecStartPost
+        pcrExecStart
       ];
     };
 

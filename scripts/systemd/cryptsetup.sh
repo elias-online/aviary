@@ -28,8 +28,6 @@ while [ ! -e "/dev/mapper/$mapper_device" ]; do
 
     umask 0022
 
-    echo "$flags"
-
     $systemd_path/bin/systemd-cryptsetup attach "$mapper_device" "$disk_path" "/luks-key" "$flags"
 
     if [ ! -e "/dev/mapper/$mapper_device" ]; then
