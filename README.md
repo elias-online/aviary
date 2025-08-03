@@ -32,8 +32,12 @@ Aviary is an opinionated NixOS flake configuration designed to facility easy sys
  - Optional Gnome Desktop
 
 # TODO
- - Initrd VPN connection no experation option
- - Log out of tailscale before shutdown if ephemeral ts key
+ - Clean up services/vpn.nix
+ - Clean up initrd services
+ - Remove need for --impure when building/rebuilding all systems except egg
+ - Use ephemeral Tailscale keys for all connections
+ - Get auto updates to work for systems that didn't update flake.lock themselves
+ - Beautify Aviary boot sequence messages
 
 # SETUP
 
@@ -60,6 +64,11 @@ sudo btrfs qgroup show -r /
 ### Garbage Collection
 ```
 nix-collect-garbage -d
+```
+
+### Enroll TPM2
+```
+systemd-cryptenroll /dev/disk/by-partlable/disk-primary-luks-hostname --tpm2-device=auto --tpm2-pcrs=0+2+4+7
 ```
 
 # FEATURE MATRIX

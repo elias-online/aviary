@@ -1,5 +1,10 @@
-{...}: {
+{
+  ...
+}:
+
+{
   config = {
+    
     system.autoUpgrade = {
       enable = false;
       dates = "02:00";

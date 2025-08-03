@@ -225,15 +225,9 @@ mkdir -p /tmp/aviary-extra-files/persist/var/lib
 cp -r /tmp/aviary-extra-files/var/lib/sbctl /tmp/aviary-extra-files/persist/var/lib
 
 if [[ "$config" == "egg" ]]; then
-    echo ${drive} | tee /tmp/egg-drive >/dev/null
-    < /dev/urandom tr -dc 'A-Za-z0-9' | head -c 10 > /tmp/egg-drive-name
-#else
-#    mkdir -p /tmp/aviary-extra-files/persist/var/lib
-#    mkdir -p /tmp/aviary-extra-files/var/lib
-#    ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "sbctl create-keys"
-#    scp -r root@$target:/var/lib/sbctl /tmp/aviary-extra-files/persist/var/lib
-#    ssh -o BatchMode=yes -o ConnectTimeout=5 root@$target "rm -rf /var/lib/sbctl" #may need to not do this
-#    cp -r /tmp/aviary-extra-files/persist/var/lib/sbctl /tmp/aviary-extra-files/var/lib
+    echo -n ${drive} | tee /tmp/egg-drive >/dev/null
+    rand_str=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 8)
+    echo -n "egg-${rand_str}" > /tmp/egg-drive-name
 fi
 
 if [[ "$target" == "localhost" ]]; then

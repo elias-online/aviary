@@ -53,7 +53,7 @@
     system = "x86_64-linux";
     #pkgs = nixpkgs.legacyPackages.${system};
     pkgs = import nixpkgs {
-      system = "x86_64-linux";
+      hostPlatform = system;
       config.allowUnfree = true;
     };
   in {
@@ -69,7 +69,6 @@
           inputs.sops-nix.nixosModules.sops
           ./environments/modules/bootstrap.nix
           ./environments/modules/default.nix
-          #./environments/modules/usersbase.nix
         ];
       };
 
@@ -81,8 +80,7 @@
 
       graphical = _: {
         imports = [
-          self.nixosModules.minimal #default
-          #self.nixosModules.remote
+          self.nixosModules.minimal
           ./environments/modules/bluetooth.nix
           ./environments/modules/flatpak.nix
           ./environments/modules/gnome.nix
@@ -91,18 +89,15 @@
           ./environments/modules/plymouth.nix
           ./environments/modules/powerprofile.nix
           ./environments/modules/print.nix
-          #./environments/modules/update.nix 
         ];
       };
 
       graphicalHyprland = _: {
         imports = [
-	        self.nixosModules.minimal #default
-          #self.nixosModules.remote
+	        self.nixosModules.minimal
 	        ./environments/modules/hyprland.nix
 	        ./environments/modules/networkmanager.nix
 	        ./environments/modules/plymouth.nix
-          #./environments/modules/update.nix
 	      ];
       };
 
@@ -110,7 +105,6 @@
         imports = [
           self.nixosModules.default
           self.nixosModules.remote
-          #./environments/modules/secureboot.nix
           ./environments/modules/update.nix
         ];
       };
@@ -118,19 +112,14 @@
       recovery = _: {
         imports = [
           self.nixosModules.minimal
-          #self.nixosModules.default
-          #self.nixosModules.remote
           ./environments/modules/recovery.nix
-          #./environments/modules/update.nix
         ];
       };
 
       remote = _: {
         imports = [
-          ./services/ssh.nix
-          ./services/sshinitrd.nix 
+          ./services/ssh.nix 
           ./services/vpn.nix
-          ./services/vpninitrd.nix
         ];
       };
     };
@@ -221,17 +210,16 @@
       "ibis" = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs;};
         modules = [
-          self.nixosModules.graphical
+          self.nixosModules.minimal
+          self.nixosModules.debug # TODO REMOVE ME
           ./systems/ibis.nix
           ./users/00.nix
-          ./environments/modules/debug.nix
         ];
       };
 
       "cardinal" = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs;};
         modules = [
-          { system.stateVersion = "25.05"; }
           self.nixosModules.default
           self.nixosModules.debug # TODO REMOVE ME
           ./systems/cardinal.nix

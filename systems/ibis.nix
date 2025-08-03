@@ -2,53 +2,50 @@
 # CPU: Intel 11300H
 # MBD: Microsoft Surface Laptop Studio 1
 # RAM: Integrated 16GB
-# STO: Predator 512GB NVME SSD
+# STO: Samsung 256GB NVME SSD
 # MON: Integrated 2400x1600 120Hz Touchscreen
 #################
+
 {
-  config,
   inputs,
   pkgs,
-  modulesPath,
   ...
-}: {
+}:
+
+{
   imports = [
-    (modulesPath + "/installer/scan/not-detected.nix")
     inputs.hardware.nixosModules.microsoft-surface-pro-intel
     inputs.hardware.nixosModules.microsoft-surface-common
-
-    ./modules/partsinglequota.nix
+    ./modules/partitions/quota.nix
   ];
 
   config = {
-    
-    sops.secrets."ibis-drive-primary" = {
-      mode = "0440";
-      owner = config.users.users."1000".name;
-      group = "admin";
+
+    boot = {
+      kernelModules = [ "kvm-intel" ];
+
+      initrd = {
+        kernelModules = [ "surface_aggregator_hub" ];
+        availableKernelModules = [
+          "8250_dw"
+          "intel_lpss"
+          "intel_lpss_pci"
+          "iwlmvm"
+          "iwlwifi"
+          "nvme"
+          "pinctrl_tigerlake"
+          "surface_aggregator"
+          "surface_aggregator_hub"
+          "surface_aggregator_registry"
+          "surface_hid"
+          "surface_hid_core"
+          "sd_mod"
+          "thunderbolt"
+          "usb_storage"
+          "xhci_pci" 
+        ];
+      };
     };
-
-    boot.initrd.availableKernelModules = [
-      "nvme"
-      "sd_mod"
-      "thunderbolt"
-      "usb_storage"
-      "xhci_pci"
-      "8250_dw"
-      "intel_lpss"
-      "intel_lpss_pci"
-      "iwlmvm"
-      "iwlwifi"
-      "pinctrl_tigerlake"
-      "surface_aggregator"
-      "surface_aggregator_hub"
-      "surface_aggregator_registry"
-      "surface_hid"
-      "surface_hid_core"
-    ];
-
-    boot.initrd.kernelModules = ["surface_aggregator_hub"];
-    boot.kernelModules = ["kvm-intel"];
 
     environment = {
       systemPackages = with pkgs; [
@@ -98,11 +95,5 @@
     };
 
     networking.hostName = "ibis";
-    time.timeZone = "America/Los_Angeles";
-
-    nixpkgs.hostPlatform = "x86_64-linux";
-    nixpkgs.config.allowUnfree = true;
-    system.stateVersion = "24.05";
-    home-manager.users."1000".home.stateVersion = "24.05";
   };
 }

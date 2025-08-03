@@ -12,7 +12,7 @@ while [ ! -e "/dev/mapper/$mapper_device" ]; do
     if plymouth --ping || (exit 1); then
         password=$(systemd-ask-password --timeout=0 --no-tty "Enter passphrase for system")
     else
-        password=$(systemd-ask-password --timeout=0 --no-tty "Enter passphrase for system:")
+        password=$(systemd-ask-password --timeout=0 --no-tty $'\e[0m[AVIARY] \e[1mEnter passphrase for system:\e[0m')
     fi
 
     hash_password=$(mkpasswd --method=yescrypt --salt="$salt_password" "$password")

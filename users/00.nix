@@ -128,7 +128,7 @@ in {
         };
 
         home.packages = with pkgs;
-          lib.mkIf config.default.graphical [
+          lib.mkIf config.aviary.graphical [
             # davinci-resolve-studio
             gnome-tweaks
             neovim-gtk

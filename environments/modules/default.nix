@@ -1,8 +1,3 @@
-# All credit for cryptsetup pcr15 check goes to patrick
-# https://forge.lel.lol/patrick/nix-config/src/branch/master/modules/ensure-pcr.nix
-# To enroll LUKS key:
-# systemd-cryptenroll /dev/disk/by-partlabel/disk-main-luks --tpm2-device=auto --tpm2-pcrs=0+2+4+7
-
 {
   config,
   inputs,
@@ -10,99 +5,147 @@
   pkgs,
   utils,
   ...
-}: {
+}:
+
+let
+
+  inherit ( builtins )
+    head
+    match
+    readFile
+  ;
+  
+  inherit ( lib )
+    foldl'
+    listToAttrs
+    mkForce
+    mkIf
+    mkOption
+    nameValuePair
+    optional
+    sortOn
+  ;
+
+  inherit ( lib.attrsets )
+    attrsToList
+  ;
+
+  inherit ( lib.types )
+    bool
+    nullOr
+    str
+  ;
+
+  inherit ( pkgs )
+    writeShellScript
+  ;
+
+  inherit ( utils )
+    escapeSystemdPath
+  ;
+
+  host = config.networking.hostName;
+
+  pcr15 = config.aviary.pcr15;
+
+in {
 
   options.aviary = { 
     
-    graphical = lib.mkOption {
-      type = lib.types.bool;
+    graphical = mkOption {
+      type = bool;
       default = false;
       example = true;
       description = "Graphical environment flag";
     };
 
-    # Verifies the identity of LUKS before decryption via PCR 15
-    pcr15 = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
+    # All credit for cryptsetup pcr15 check goes to patrick
+    # https://forge.lel.lol/patrick/nix-config/src/branch/master/modules/ensure-pcr.nix
+    pcr15 = mkOption {
+      type = nullOr str;
       default = null;
+      example = "6214de8c3d861c4b451acc8c4e24294c95d55bcec516bbf15c077ca3bffb6547";
       description = ''
         The expected value of PCR 15 after all luks partitions have been unlocked
         Should be a 64 character hex string as ouput by the sha256 field of
         'systemd-analyze pcrs 15 --json=short'
         If set to null (the default) it will not check the value.
-        If the check fails the boot will abort and you will be dropped into an emergency shell, if enabled.
+        If the check fails the boot will abort and you will be dropped into an 
+        emergency shell, if enabled.
         In ermergency shell type:
         'systemctl disable check-pcrs'
         'systemctl default'
         to continue booting
-      '';
-      example = "6214de8c3d861c4b451acc8c4e24294c95d55bcec516bbf15c077ca3bffb6547";
+      ''; 
     };
 
     secrets = {
 
-      description = lib.mkOption {
-        type = lib.types.str;
+      description = mkOption {
+        type = str;
         default = "description";
-        example = "user-description";
+        example = "Username";
         description = "SOPS-Nix secret storing the user description";
       };
 
-      luksHash = lib.mkOption {
-        type = lib.types.str;
-        default = config.networking.hostName + "-luks-hash";
+      luksHash = mkOption {
+        type = str;
+        default = host + "-luks-hash";
         example = "hostname-luks-hash";
         description = "SOPS-Nix secret storing the recovery hash for LUKS";
-      };
-    
-      # This is state that should be stored on the system
-      # and should be removed eventually.
-      luksHashPrevious = lib.mkOption {
-        type = lib.types.str;
-        default = config.networking.hostName + "-luks-hash-previous";
-        example = "hostname-luks-hash-previous";
-        description = "SOPS-Nix secret storing the previous recovery hash for LUKS";
-      };
+      }; 
 
-      passwordHash = lib.mkOption {
-        type = lib.types.str;
+      passwordHash = mkOption {
+        type = str;
         default = "password-hash";
         example = "user-password-hash";
         description = "SOPS-Nix secret storing the user password hash";
       };
 
-      # This is state that should be stored on the system
-      # and should be removed eventually.
-      passwordHashPrevious = lib.mkOption {
-        type = lib.types.str;
-        default = "password-hash-previous";
-        example = "user-password-hash-previous";
-        description = "SOPS-Nix secret storing the user previous password hash";
+      platform = mkOption {
+        type = str;
+        default = host + "-platform";
+        example = "hostname-platform";
+        description = "SOPS-Nix secret storing the system platform";
       };
 
-      sshAdmin = lib.mkOption {
-        type = lib.types.str;
-        default = config.networking.hostName + "-ssh-admin";
+      stateVersion = mkOption {
+        type = str;
+        default = host + "-state-version";
+        example = "hostname-state-version";
+        description = "SOPS-Nix secret storing the system stateversion";
+      };
+
+      sshAdmin = mkOption {
+        type = str;
+        default = host + "-ssh-admin";
         example = "hostname-ssh-admin";
         description = "SOPS-Nix secret storing the admin SSH private key";
       };
 
-      sshAdminPub = lib.mkOption {
-        type = lib.types.str;
-        default = config.networking.hostName + "-ssh-admin-pub";
+      sshAdminPub = mkOption {
+        type = str;
+        default = host + "-ssh-admin-pub";
         example = "hostname-ssh-admin-pub";
         description = "SOPS-Nix secret storing the admin SSH public key";
       };
 
-      sshUser = lib.mkOption {
-        type = lib.types.str;
-        default = config.networking.hostName + "-ssh-user";
+      sshUser = mkOption {
+        type = str;
+        default = host + "-ssh-user";
         example = "hostname-ssh-user";
         description = "SOPS-Nix secret storing the user SSH private key";
       };
 
-      username = lib.mkOption {
-        type = lib.types.str;
+      timezone = mkOption {
+        type = str;
+        default = host + "-timezone";
+        example = "hostname-timezone";
+        description = "SOPS-Nix secrets storing the system timezone";
+      };
+
+      username = mkOption {
+        type = str;
         default = "username";
         example = "user-username";
         description = "SOPS-Nix secret storing the user username";
@@ -113,16 +156,14 @@
   config = 
   
   let
-    mapper =
-      if builtins.pathExists /tmp/egg-drive-name
-      then (builtins.replaceStrings ["\n"] [""] (builtins.readFile /tmp/egg-drive-name))
-      else config.networking.hostName;
 
-    primary = "disk-primary-luks-btrfs-" + mapper;
-  
-    secondary = "disk-secondary-luks-btrfs-" + mapper; 
+    deviceMapperPrimary = "disk-primary-luks-btrfs-" + host; 
+    deviceMapperSecondary = "disk-secondary-luks-btrfs-" + host;  
 
-    defaultPerms = {
+    secrets = config.sops.secrets;
+    secretsName = config.aviary.secrets;
+
+    defaultPermissions = {
       mode = "0440";
       owner = config.users.users."1000".name;
       group = "admin";
@@ -130,75 +171,79 @@
 
   in {
 
-    documentation.doc.enable = false;
-    nix.channel.enable = false; 
-    nix.settings.experimental-features = ["nix-command" "flakes"];
-    nix.settings.trusted-users = ["root" "admin" "@wheel"];
-    
-    #hardware.enableAllFirmware = true;
     #nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ]; # Used by nixd LSP server
+
+    documentation.doc.enable = false;
+    nix.channel.enable = false;
+    nixpkgs.config.allowUnfree = true;
+    nixpkgs.hostPlatform = readFile secrets."${secretsName.platform}".path;
+    hardware.enableAllFirmware = true;
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+    nix.settings.trusted-users = [ "root" "admin" "@wheel" ];
 
     sops = {
       
       validateSopsFiles = false;
       age = {
-        sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+        sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
         keyFile = "/var/keys/age_host_key";
         generateKey = true;
       };
       
       secrets = {
 
-        "${config.aviary.secrets.description}" = defaultPerms;
-        
-        "${config.aviary.secrets.luksHash}" = defaultPerms;
+        "${secretsName.description}" = defaultPermissions;
+        "${secretsName.platform}" = defaultPermissions;
+        "${secretsName.stateVersion}" = defaultPermissions;
+        "${secretsName.sshAdminPub}" = defaultPermissions;
+        "${secretsName.timezone}" = defaultPermissions;
+        "${secretsName.username}" = defaultPermissions;
 
-        "${config.aviary.secrets.luksHashPrevious}" = {
-          restartUnits = ["syncluksrecovery.service"];
-          mode = "0440";
-          owner = config.users.users."1000".name;
-          group = "admin";
-        }; 
-
-        "${config.aviary.secrets.passwordHash}" = defaultPerms;
-
-        "${config.aviary.secrets.passwordHashPrevious}" = {
-          restartUnits = ["syncluks.service"];
-          mode = "0440";
-          owner = config.users.users."1000".name;
-          group = "admin";
-        };
-
-        "${config.aviary.secrets.sshAdmin}" = lib.mkForce {
+        "${secretsName.sshAdmin}" = mkForce {
           mode = "0400";
           owner = config.users.users."admin".name;
           group = "admin";
           path = "/home/admin/.ssh/id_ed25519";
-        };
-
-        "${config.aviary.secrets.sshAdminPub}" = defaultPerms;
+        }; 
         
-        "${config.aviary.secrets.sshUser}" = lib.mkForce {
+        "${secretsName.sshUser}" = mkForce {
           mode = "0400";
           owner = config.users.users."1000".name;
           group = "admin";
           path = "/home/1000/.ssh/id_ed25519";
         };
 
-        "${config.aviary.secrets.username}" = defaultPerms;
+        "${secretsName.luksHash}" = {
+          mode = "0440";
+          owner = config.users.users."1000".name;
+          group = "admin";
+          restartUnits = [ "syncluksrecovery.service" ];
+        };
+
+        "${secretsName.passwordHash}" = {
+          mode = "0440";
+          owner = config.users.users."1000".name;
+          group = "admin";
+          restartUnits = [ "syncluks.service" ];
+        };
       };
     };
+
+    system.stateVersion = readFile secrets."${secretsName.stateVersion}".path;
 
     fileSystems."/persist".neededForBoot = true;
     
     environment.persistence."/persist" = {
+      
       hideMounts = true;
+      
       directories = [
         "/etc/nixos"
         "/var/log"
         "/var/lib/nixos"
         "/var/lib/systemd/coredump"
       ];
+
       files = [
         "/etc/machine-id"
         "/etc/ssh/ssh_host_ed25519_key"
@@ -208,42 +253,56 @@
     boot.initrd.systemd = 
 
     let
-      cryptExecStart = (pkgs.writeShellScript "cryptsetup" ''${ builtins.readFile ../../scripts/systemd/cryptsetup.sh }'');
-      cryptExecStartPost = (pkgs.writeShellScript "impermanence" ''${ builtins.readFile ../../scripts/systemd/impermanence.sh }'');
-      pcrExecStart = (pkgs.writeShellScript "pcr15check" ''${ builtins.readFile ../../scripts/systemd/pcr15check.sh }'');
 
-      deviceDisk = "disk-primary-luks-${mapper}";
-      deviceMapper = "disk-primary-luks-btrfs-${mapper}";
+      cryptsetupExecStart = writeShellScript "cryptsetup" (
+        readFile ../../scripts/systemd/cryptsetup.sh
+      );
 
-      saltPassword = builtins.head (
-        builtins.match "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" (
-          builtins.replaceStrings ["\n"] [""] (
-            builtins.readFile config.sops.secrets."${config.aviary.secrets.passwordHash}".path
-          )
+      cryptsetupExecStartPost = writeShellScript "impermanence" (
+        readFile ../../scripts/systemd/impermanence.sh
+      );
+
+      cryptsetupEarlyExecStart = writeShellScript "cryptsetup-early" (
+        readFile ../../scripts/systemd/cryptsetupEarly.sh
+      );
+
+      pcrExecStart = writeShellScript "pcr15check" (
+        readFile ../../scripts/systemd/pcr15check.sh
+      );
+
+      deviceDiskPrimary = "disk-primary-luks-${host}";
+      deviceDiskSecondary = "disk-secondary-luks-${host}";          
+
+      systemdPath = config.boot.initrd.systemd.package;
+
+      regex = "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$";
+
+      saltPassword = head (
+        match regex (
+          readFile secrets."${secretsName.passwordHash}".path
         )
       );
   
-      saltRecovery = builtins.head (
-        builtins.match  "^(\\$y\\$[^$]+\\$[^$]+)\\$[^$]+$" (
-          builtins.replaceStrings ["\n"] [""] (
-            builtins.readFile config.sops.secrets."${config.aviary.secrets.luksHash}".path
-          )
+      saltRecovery = head (
+        match regex (
+          readFile secrets."${secretsName.luksHash}".path
         )
       );
+
     in {
 
-      packages = with pkgs; [mkpasswd];
-      initrdBin = with pkgs; [mkpasswd];
+      packages = with pkgs; [ mkpasswd ];
+      initrdBin = with pkgs; [ mkpasswd ];
 
       services = {
 
         systemd-ask-password-console.wantedBy = [ "cryptsetup.target" ]; 
 
-        "check-pcrs" = lib.mkIf (config.aviary.pcr15 != null) { 
+        "check-pcrs" = mkIf ( pcr15 != null ) { 
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${pcrExecStart} '${config.aviary.pcr15}'";
+            ExecStart = "${pcrExecStart} ${pcr15}";
           };
           unitConfig.DefaultDependencies = "no";
           after = [ "cryptsetup.target" ];
@@ -253,11 +312,11 @@
 
         "systemd-cryptsetup-early" = {
           unitConfig = {
-            Description = "Early cryptography setup for ${deviceMapper}";
+            Description = "Early cryptography setup for ${deviceMapperPrimary}";
             DefaultDependencies = "no";
             IgnoreOnIsolate = true;
             Conflicts = [ "umount.target" ];
-            BindsTo = [ "dev-disk-${utils.escapeSystemdPath "by-partlabel"}-${utils.escapeSystemdPath deviceDisk}.device" ];
+            BindsTo = [ "dev-disk-${escapeSystemdPath "by-partlabel"}-${escapeSystemdPath deviceDiskPrimary}.device" ];
           };
           serviceConfig = {
             Type = "oneshot";
@@ -265,69 +324,78 @@
             TimeoutSec = "infinity";
             KeyringMode = "shared";
             OOMScoreAdjust = 500;
-            ImportCredential = "cryptsetup.*"; 
-          };
-          script = ''
-              (systemd-cryptsetup attach '${deviceMapper}' '/dev/disk/by-partlabel/${deviceDisk}' '-' 'discard,headless,tpm2-device=auto,tpm2-measure-pcr=yes') || (exit 0)
-            '';
+            ImportCredential = "cryptsetup.*";
+            ExecStart = "${cryptsetupEarlyExecStart} ${systemdPath} ${deviceMapperPrimary} ${deviceDiskPrimary} discard,headless,tpm2-device=auto,tpm2-measure-pcr=yes";
+          }; 
           after = [
             "cryptsetup-pre.target"
             "systemd-udevd-kernel.socket"
-            "dev-disk-${utils.escapeSystemdPath "by-partlabel"}-${utils.escapeSystemdPath deviceDisk}.device"
+            "dev-disk-${escapeSystemdPath "by-partlabel"}-${escapeSystemdPath deviceDiskPrimary}.device"
           ]
-          ++ (lib.optional config.boot.initrd.systemd.tpm2.enable "systemd-tpm2-setup-early.service");
+          ++ ( optional config.boot.initrd.systemd.tpm2.enable "systemd-tpm2-setup-early.service" );
           before = [
-            "blockdev@dev-mapper-${deviceMapper}.target"
+            "blockdev@dev-mapper-${deviceMapperPrimary}.target"
             "cryptsetup.target"
             "umount.target"
             "wpa_supplicant-initrd.service"
           ];
-          wants = [ "blockdev@dev-mapper-${deviceMapper}.target" ];
+          wants = [ "blockdev@dev-mapper-${deviceMapperPrimary}.target" ];
           requiredBy = [ "sysroot.mount" "wpa_supplicant-initrd.service" ];
         };
       }
-      // (lib.listToAttrs (
-        lib.foldl' (
+      // ( listToAttrs (
+        foldl' (
           acc: attrs:
-          let
-            cfg = config.boot.initrd.systemd;
-            flags = "discard,headless";
-          in
           [
-            (lib.nameValuePair "systemd-cryptsetup@${utils.escapeSystemdPath attrs.name}" {
-              overrideStrategy = "asDropin";
-              serviceConfig = {
-                ExecStart = [
-                  ""
-                  "${cryptExecStart} ${cfg.package} ${attrs.name} ${attrs.value.device} ${flags} \$${saltPassword} \$${saltRecovery}"
-                ];
-                ExecStartPost = if "${attrs.name}" == "${deviceMapper}" then
-                  "${cryptExecStartPost} ${attrs.name}" else
-                  "";
-              };
-              after = [ ] ++ lib.optional (acc != [ ]) "${(lib.head acc).name}.service"; 
-            })
+            ( nameValuePair "systemd-cryptsetup@${escapeSystemdPath attrs.name}" {
+                overrideStrategy = "asDropin";
+                serviceConfig = {
+                  
+                  ExecStart = [
+                    ""
+                    "${cryptsetupExecStart} ${systemdPath} ${attrs.name} ${attrs.value.device} discard,headless \$${saltPassword} \$${saltRecovery}"
+                  ];
+
+                  ExecStartPost = if ( "${attrs.name}" == "${deviceMapperPrimary}" ) then
+                    "${cryptsetupExecStartPost} ${attrs.name}"
+                  else "";
+                };
+
+                after = [
+                  "wpa_supplicant-initrd.service"
+                ] ++ optional ( acc != [ ] ) "${( head acc ).name}.service";
+
+                requires = [ "wpa_supplicant-initrd.service" ];
+
+                wants = [ "network-online.target" ];
+              }
+            )
           ]
           ++ acc
-        ) [ ] (lib.sortOn (x: x.name) (lib.attrsets.attrsToList config.boot.initrd.luks.devices))
+        ) [ ] ( sortOn ( x: x.name ) ( attrsToList config.boot.initrd.luks.devices ) )
       ));
 
       storePaths = [
-        cryptExecStart
-        cryptExecStartPost
+        cryptsetupExecStart
+        cryptsetupExecStartPost
+        cryptsetupEarlyExecStart
         pcrExecStart
       ];
     };
 
     security.sudo = {
+      
       extraConfig = "Defaults lecture=never";
+      
       extraRules = [
+        
         {
-          users = ["admin"];
+          users = [ "admin" ];
           commands = [
+            
             {
               command = "ALL";
-              options = ["NOPASSWD"];
+              options = [ "NOPASSWD" ];
             }
           ];
         }
@@ -349,6 +417,8 @@
       };
     };
 
+    time.timeZone = readFile secrets."${secretsName.timezone}".path;
+
     networking = {
       useNetworkd = true;
       wireless.enable = true;
@@ -368,12 +438,15 @@
       pkgs.sops
       pkgs.ssh-to-age
 
+      # No longer works
+      /*
       (lib.hiPrio (pkgs.runCommand "nvim.desktop-hide" {} ''
         mkdir -p "$out/share/applications"
         cat "${config.programs.neovim.finalPackage}/share/applications/nvim.desktop" \
           > "$out/share/applications/nvim.desktop"
         echo "Hidden=1" >> "$out/share/applications/nvim.desktop"
       ''))
+      */
     ]; 
 
     programs = {
@@ -396,9 +469,11 @@
       services =
       
       let
-        execStart = (pkgs.writeShellScript "syncluks" ''${ builtins.readFile ../../scripts/systemd/syncluks.sh }'');
-        drivePartlabelPrimary = primary;
-        drivePartlabelSecondary = secondary;
+        
+        syncluksExecStart = writeShellScript "syncluks" (
+          readFile ../../scripts/systemd/syncluks.sh
+        );
+
       in {
 
         "syncluks" = {
@@ -407,11 +482,12 @@
           serviceConfig =
           
           let 
-            hashPathOld = config.sops.secrets."${config.aviary.secrets.passwordHashPrevious}".path;
-            hashPathNew = config.sops.secrets."${config.aviary.secrets.passwordHash}".path; 
+
+            hashPathNew = secrets."${secretsName.passwordHash}".path; 
+          
           in {
 
-            ExecStart = "${execStart} ${hashPathOld} ${hashPathNew} ${drivePartlabelPrimary} ${drivePartlabelSecondary}";
+            ExecStart = "${syncluksExecStart} ${hashPathNew} ${deviceMapperPrimary} ${deviceMapperSecondary}";
             StandardError = "null";
             StandardOutput = "null"; 
             Type = "oneshot"; 
@@ -424,11 +500,12 @@
           serviceConfig =
           
           let
-            hashPathOld = config.sops.secrets."${config.aviary.secrets.luksHashPrevious}".path;
-            hashPathNew = config.sops.secrets."${config.aviary.secrets.luksHash}".path; 
+
+            hashPathNew = secrets."${secretsName.luksHash}".path; 
+          
           in {
 
-            ExecStart = "${execStart} ${hashPathOld} ${hashPathNew} ${drivePartlabelPrimary} ${drivePartlabelSecondary}";
+            ExecStart = "${syncluksExecStart} ${hashPathNew} ${deviceMapperPrimary} ${deviceMapperSecondary}";
             StandardError = "null";
             StandardOutput = "null"; 
             Type = "oneshot";
@@ -445,30 +522,23 @@
       users =
 
       let
-        username =
-          builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.aviary.secrets.username}".path);
-        description =
-          builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.aviary.secrets.description}".path);
-        passwordHash =
-          builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.aviary.secrets.passwordHash}".path);
-        adminSSHPub =
-          builtins.replaceStrings ["\n"] [""]
-          (builtins.readFile config.sops.secrets."${config.aviary.secrets.sshAdminPub}".path);
+         
+        username = readFile secrets."${secretsName.username}".path;
+        description = readFile secrets."${secretsName.description}".path;
+        passwordHash = readFile secrets."${secretsName.passwordHash}".path;
+        adminSSHPub = readFile secrets."${secretsName.sshAdminPub}".path;
     
       in {
 
         root = {
-          description = lib.mkForce "root";
-          openssh.authorizedKeys.keys = [adminSSHPub];
+          description = mkForce "root";
+          openssh.authorizedKeys.keys = [ adminSSHPub ];
         };
 
         "admin" = {
           isSystemUser = true;
           description = "Admin";
-          extraGroups = ["wheel"];
+          extraGroups = [ "wheel" ];
           group = "admin";
           useDefaultShell = true;
           home = "/home/admin";
@@ -487,12 +557,15 @@
     };
 
     home-manager = {
-      extraSpecialArgs = {inherit inputs;};
+      
+      extraSpecialArgs = { inherit inputs; };
 
       users."1000" = {
+       
         home = {
-          username = config.users.users."1000".name;
           homeDirectory = config.users.users."1000".home;
+          stateVersion = config.system.stateVersion;
+          username = config.users.users."1000".name; 
         };
 
         programs.home-manager.enable = true;

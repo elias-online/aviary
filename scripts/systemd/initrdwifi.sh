@@ -9,13 +9,15 @@ ssid=""
 
 if [ -e "/dev/mapper/$mapper_device" ]; then
     echo "Mapper device already unlocked with TPM, exiting..."
+    systemd-notify --ready
     exit 0
 fi
 
 sleep 5
 
 if [ ! -e "/sys/class/net/wifi0" ]; then
-    echo "No wifi device present, stopping pre-start script..."
+    echo "No Wi-Fi device present, exiting..."
+    systemd-notify --ready
     exit 0
 fi
 
@@ -23,17 +25,8 @@ sleep 5
 
 while read -r line; do
     if [[ "$line" == *ether* && "$line" == *routable* ]]; then
-        if plymouth --ping || false; then
-            plymouth display-message --text="Wired connection established, stopping Wi-Fi setup."
-            sleep 1
-            plymouth display-message --text="Wired connection established, stopping Wi-Fi setup.."
-            sleep 1
-            plymouth display-message --text="Wired connection established, stopping Wi-Fi setup..."
-            sleep 1
-            plymouth display-message --text=""
-        else
-            echo "Wired connection established, stopping Wi-Fi setup..." > /dev/console
-        fi
+        echo "Wired connection established, exiting..."
+        systemd-notify --ready
         exit 0
     fi
 done < <(networkctl list --no-pager)
@@ -43,10 +36,10 @@ while [[ "$connection" == "no" ]]; do
     if plymouth --ping || false; then
         tmpFile="/run/plymouth-wifi-input"
         rm -f "$tmpFile"
-        plymouth display-message --text="Connect to Wi-Fi [ y/N ]"
+        plymouth display-message --text="No wired network found. Connect to Wi-Fi? [ y/N ]"
 
         (
-            setupwifi=$(plymouth watch-keystroke --keys="yYnN")
+            setupwifi=$(plymouth watch-keystroke --keys="yYnNenter")
             echo "$setupwifi" > "$tmpFile"
         ) &
 
@@ -67,16 +60,17 @@ while [[ "$connection" == "no" ]]; do
             kill "$pid" 2>/dev/null || true
         fi
     else
-        setupwifi=$(systemd-ask-password -e --timeout=20 --no-tty "Connect to Wi-Fi [ y/N ]" || true)
+        setupwifi=$(systemd-ask-password -e --timeout=20 --no-tty $'\e[0m[AVIARY] \e[1mNo wired network found. Connect to Wi-Fi? [ y/N ]\e[0m' || true)
     fi
     if [[ "$setupwifi" != "y" && "$setupwifi" != "Y" ]]; then
+        systemd-notify --ready
         exit 0
     fi
 
     if plymouth --ping || false; then
         ssid=$(plymouth ask-question --prompt="Enter Wi-Fi name")
     else
-        ssid=$(systemd-ask-password -e --timeout=0 --no-tty "Enter Wi-Fi name:")
+        ssid=$(systemd-ask-password -e --timeout=0 --no-tty $'\e[0m[AVIARY] \e[1mEnter Wi-Fi name:\e[0m')
     fi
 
     psk=""
@@ -84,7 +78,7 @@ while [[ "$connection" == "no" ]]; do
         if plymouth --ping || false; then
             psk=$(systemd-ask-password -e --timeout=0 --no-tty "Enter Wi-Fi password")
         else
-            psk=$(systemd-ask-password -e --timeout=0 --no-tty "Enter Wi-Fi password:")
+            psk=$(systemd-ask-password --timeout=0 --no-tty $'\e[0m[AVIARY] \e[1mEnter Wi-Fi password:\e[0m')
         fi
     done
 
@@ -107,13 +101,26 @@ while [[ "$connection" == "no" ]]; do
 
     if [[ "$connection" == "no" ]]; then
         if plymouth --ping || false; then
+            plymouth display-message --text="Failed to connect to Wi-Fi."
+            sleep 1
+            plymouth display-message --text="Failed to connect to Wi-Fi.."
+            sleep 1
             plymouth display-message --text="Failed to connect to Wi-Fi..."
-            sleep 3
+            sleep 1
             plymouth display-message --text=""
         else
-            echo "Failed to connect to Wi-Fi..." > /dev/console
+            echo -e -n "\e[0m[AVIARY] \e[1mFailed to connect to Wi-Fi.\e[0m\r" > /dev/console
+            sleep 1
+            echo -e -n "\e[0m[AVIARY] \e[1mFailed to connect to Wi-Fi..\e[0m\r" > /dev/console
+            sleep 1
+            echo -e -n "\e[0m[AVIARY] \e[1mFailed to connect to Wi-Fi...\e[0m\n" > /dev/console
+            sleep 1
         fi
     fi
 
     kill "$(cat "$pidfile")"
 done
+
+systemd-notify --ready
+
+wpa_supplicant -c /etc/wpa_supplicant/wpa_supplicant-wifi0.conf -i wifi0
